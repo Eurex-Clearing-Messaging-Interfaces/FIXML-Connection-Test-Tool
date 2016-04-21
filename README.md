@@ -1,82 +1,65 @@
-FIXML Connection Test Tool
-==========================
+# FIXML Connection Test Tool
+
 FIXML Connection Test Tool is a simple Java tool, which provides two basic functionalities:
 
-1. receiving a broadcast message:    Connects to the broker and tries to receive a single broadcast message.
----------------------------------
+1. Receiving a broadcast message: Connects to the broker and tries to receive a single broadcast message.
+2. Sending a request message and receiving a response: Connects to the broker and registers a response queue. Sends single request message and tries to receive a response.
 
-2. sending a request message and receiving a response:  Connects to the broker and registers a response queue. Sends
-------------------------------------------------------  single request message and tries to receive a response.
+It was designed as a connection tool for members, since the Java SSL debugging capabilities are very useful for analysis of issues related to SSL certificates. It was primarily designed for FIXML interface but can be used also for FpML (see example how to specify FpML stream name).
 
-It was designed as a connection tool for members, since the Java SSL debugging capabilities are very useful for analysis
-of issues related to SSL certificates. It was primarily designed for FIXML interface but can be used also for
-FpML (see example how to specify FpML stream name).
+## Requirements
 
-Requirements
-------------
-The FIXML Connection Test Tool is developed using Java 1.7.x. Functionality under older or newer versions of Java is not tested.
-The tool has been tested on both Windows and Linux - it is expected to run without issues on all platforms with official
-Java support (e.g. Solaris). The tool doesn't have any kind of GUI. That allows its execution on machines without
-a graphical user interface.
+The FIXML Connection Test Tool is developed using Java 1.7.x. Functionality under older or newer versions of Java is not tested. The tool has been tested on both Windows and Linux - it is expected to run without issues on all platforms with official Java support (e.g. Solaris). The tool doesn't have any kind of GUI. That allows its execution on machines without a graphical user interface.
 
-Used API
---------
-The FIXML Connection Test Tool is based on Java API from the Apache Qpid project ( http://qpid.apache.org ), version 0.32 (AMQP 0-10) and 0.5.0 (AMQP 1.0).
-All necessary components are distributed as part of the ZIP file in the "lib" sub-directory. The code used in the
-FIXML Connection Test Tool is described in the Eurex Clearing FIXML Interface specification, Volume 2-B: AMQP Programming Guide,
-which is available in the document section of the Eurex website
-( http://www.eurexclearing.com/clearing-en/technology/eurex-release14/system-documentation/system-documentation/861464?frag=861450 ).
+## Used API
 
-Installation
-------------
-Unzip the archive content into a destination directory. Under Linux, it is necessary to add the "execute" flag to
-broadcast-receiver.sh and request-responder.sh
-file. This can be achieved by typing:
-    chmod a+x broadcast-receiver.sh
-    chmod a+x request-responder.sh
+The FIXML Connection Test Tool is based on Java API from the Apache Qpid project ( http://qpid.apache.org ), version 0.32 (AMQP 0-10) and 0.5.0 (AMQP 1.0). All necessary components are distributed as part of the ZIP file in the "lib" sub-directory. The code used in the FIXML Connection Test Tool is described in the Eurex Clearing FIXML Interface specification, Volume 2-B: AMQP Programming Guide, which is available in the document section of the Eurex website ( http://www.eurexclearing.com/clearing-en/technology/eurex-release14/system-documentation/system-documentation/861464?frag=861450 ).
 
-Usage
------
-From the unzipped archive execute either `./broadcast-receiver.sh` (Linux) / `broadcast-receiver.bat` (Windows)
-for testing the broadcast functionality or `./request-responder.sh` (Linux) / `request-responder.bat` (Windows)
-for testing the request/response functionality. This will print all the available command line parameters.
-Parameters with an additional value may be written as `--param=value` or `--param value`.
+## Installation
+
+Unzip the archive content into a destination directory. Under Linux, it is necessary to add the "execute" flag to broadcast-receiver.sh and request-responder.sh file. This can be achieved by typing:
+- chmod a+x broadcast-receiver.sh
+- chmod a+x request-responder.sh
+
+## Usage
+
+From the unzipped archive execute either `./broadcast-receiver.sh` (Linux) / `broadcast-receiver.bat` (Windows) for testing the broadcast functionality or `./request-responder.sh` (Linux) / `request-responder.bat` (Windows) for testing the request/response functionality. This will print all the available command line parameters. Parameters with an additional value may be written as `--param=value` or `--param value`.
 
 ### Mandatory parameters for both modes
-**--account <account name>** Member account ID
-**--host <host name/IP addr>** AMQP broker host name or IP address
-**--port <port number>** AMQP SSL broker port number
-**--truststore <store file>** JKS store file with AMQP broker public keys(s)
-**--truststore-password <password>** Password protecting the truststore
-**--keystore <store file>** JKS store file with member account private key(s)
-**--keystore-password <password>** Password protecting the keystore
+- **--account <account name>** Member account ID
+- **--host <host name/IP addr>** AMQP broker host name or IP address
+- **--port <port number>** AMQP SSL broker port number
+- **--truststore <store file>** JKS store file with AMQP broker public keys(s)
+- **--truststore-password <password>** Password protecting the truststore
+- **--keystore <store file>** JKS store file with member account private key(s)
+- **--keystore-password <password>** Password protecting the keystore
 
 ### Optional parameters for both modes
-**--amqp-version <AMQP protocol version>** AMQP protocol version (default: 0-10; other possibilities: 1.0)
-**--key-alias <alias>** Alias of the private key to be used (default: same as account name in lower-case)
-**--log-level <level>** Logging level (default: INFO; other possibilities: ERROR, WARNING, DEBUG, TRACE)
-**--ssl-debug** Enable detailed SSL logging (default: off)
-**--verify-hostname** Verify remote host identity (default: off)
-**--timeout <time-out in ms>** How long to wait for a message (default: 1000)
+- **--amqp-version <AMQP protocol version>** AMQP protocol version (default: 0-10; other possibilities: 1.0)
+- **--key-alias <alias>** Alias of the private key to be used (default: same as account name in lower-case)
+- **--log-level <level>** Logging level (default: INFO; other possibilities: ERROR, WARNING, DEBUG, TRACE)
+- **--ssl-debug** Enable detailed SSL logging (default: off)
+- **--verify-hostname** Verify remote host identity (default: off)
+- **--timeout <time-out in ms>** How long to wait for a message (default: 1000)
 
 ### Optional parameters for broadcast-receiver
-**--consume** Consume the message from the broker queue instead of just peeking at it (default: off)
-**--stream <stream name>** Broadcast stream to read from (default: TradeConfirmation)
+- **--consume** Consume the message from the broker queue instead of just peeking at it (default: off)
+- **--stream <stream name>** Broadcast stream to read from (default: TradeConfirmation)
 
 ### Optional parameters for request-responder
-**--msg-content <message content>** Content of the message to be sent. Default: 'FIXML Connection Test Tool testing message'
-**--msg-content-file <message content file>** File name the content of the message should be read from. To read
+- **--msg-content <message content>** Content of the message to be sent. Default: 'FIXML Connection Test Tool testing message'
+- **--msg-content-file <message content file>** File name the content of the message should be read from. To read
                                               from standard input use 'STDIN' name.
 
 
-### Example
+## Example
     ./broadcast-receive.sh --account=CBKFR_CBKFRALMMACC1 --host=ecag-fixml-simu1.deutsche-boerse.com --port=10170 --keystore=CBKFR_CBKFRALMMACC1.keystore --keystore-password=123456 --truststore=truststore --truststore-password=123456 --verify-hostname
 
-Output
-------
+### Output
+
 Depending on the chosen logging level, the output will contain more or less informational messages.
 
-### Message received
+#### Message received
 For the default log level, the following kind of output is expected in case of a successfully received message:
 
     2013-06-04 09:29:04 +0200 [main] INFO org.apache.qpid.jndi.PropertiesFileInitialContextFactory - No Provider URL specified.
@@ -90,7 +73,7 @@ For the default log level, the following kind of output is expected in case of a
 	Here is the content (payload) of the received message
 	2013-06-04 09:29:05 +0200 [main] INFO de.deutscheboerse.fixml.BroadcastReceiver - Disconnected
     
-### No message available
+#### No message available
 
 	2013-06-04 09:30:18 +0200 [main] INFO org.apache.qpid.jndi.PropertiesFileInitialContextFactory - No Provider URL specified.
 	2013-06-04 09:30:18 +0200 [IoReceiver - cbgc03/172.16.153.12:10128] WARN org.apache.qpid.transport.network.security.ssl.SSLUtil - Exception received while trying to verify hostname
@@ -102,7 +85,8 @@ For the default log level, the following kind of output is expected in case of a
 	2013-06-04 09:30:19 +0200 [main] INFO de.deutscheboerse.fixml.BroadcastReceiver - No message received
 	2013-06-04 09:30:19 +0200 [main] INFO de.deutscheboerse.fixml.BroadcastReceiver - Disconnected
 
-### SSL debugging mode
+## SSL debugging mode
+
 This mode prints detailed information about the SSL handshake in addition.
 
 	2013-06-04 09:32:27 +0200 [main] INFO org.apache.qpid.jndi.PropertiesFileInitialContextFactory - No Provider URL specified.
@@ -515,14 +499,14 @@ When client is configured as AMQP 1.0 client and server is AMQP 0-10, the follow
         at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:615)
         at java.lang.Thread.run(Thread.java:744)
 
-### Example
+## Example
     ./request-response.sh --account=CBKFR_CBKFRALMMACC1 --host=ecag-fixml-simu1.deutsche-boerse.com --port=10170 --keystore=CBKFR_CBKFRALMMACC1.keystore --keystore-password=123456 --truststore=truststore --truststore-password=123456 --verify-hostname
 
-Output
-------
+### Output
+
 Depending on the chosen logging level, the output will contain more or less informational messages.
 
-### Message sent and received
+#### Message sent and received
 
 	2013-06-04 09:49:01 +0200 [main] INFO org.apache.qpid.jndi.PropertiesFileInitialContextFactory - No Provider URL specified.
 	2013-06-04 09:49:02 +0200 [IoReceiver - cbgc03/172.16.153.12:10128] INFO org.apache.qpid.client.security.DynamicSaslRegistrar - Additional SASL providers successfully registered.
@@ -539,12 +523,12 @@ Depending on the chosen logging level, the output will contain more or less info
 Error messages are identical to the same case in broadcast-receiver.sh
 
 
-### Example for receiving broadcast from FpML interface
+## Example for receiving broadcast from FpML interface
     ./broadcast-receive.sh --account=ABCFR_ABCFRALMMACC1 --host=fpmls1.eurexclearing.com --port=18575 --keystore=ABCFR_ABCFRALMMACC1.keystore --keystore-password=123456 --truststore=truststore --truststore-password=123456 --verify-hostname --stream=TradeNotification
 
-Output
-------
-### Message received
+### Output
+
+#### Message received
 For the default log level, the following kind of output is expected in case of a successfully received message:
  
 	2013-06-05 11:57:20 +0200 [main] INFO de.deutscheboerse.fixml.CommonOptions - Received options: --account=ABCFR_ABCFRALMMACC1 --host=cbgc03 --keystore=dist/ABCFR_ABCFRALMMACC1.keystore --keystore-password=123456 --port=10129 --truststore=dist/truststore --truststore-password=123456 --verify-hostname --log-level=info --stream=TradeNotification
