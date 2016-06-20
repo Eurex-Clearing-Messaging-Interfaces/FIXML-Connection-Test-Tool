@@ -3,8 +3,10 @@
 # FIXML Connection Test Tool
 
 ## Download
-- Latest completed build - [ZIP file](https://circleci.com/api/v1/project/Eurex-Clearing-Messaging-Interfaces/FIXML-Connection-Test-Tool/latest/artifacts/0/$CIRCLE_ARTIFACTS/build/fixml-connection-test-tool.zip)
-- Latest completed build - [JAR file](https://circleci.com/api/v1/project/Eurex-Clearing-Messaging-Interfaces/FIXML-Connection-Test-Tool/latest/artifacts/0/$CIRCLE_ARTIFACTS/build/fixml-connection-test-tool.jar)
+Releases can be downloaded from the release section.
+Following links are to the latest snapshot (nightly) builds.
+- Latest completed snapshot build - [ZIP](https://circleci.com/api/v1/project/Eurex-Clearing-Messaging-Interfaces/FIXML-Connection-Test-Tool/latest/artifacts/0/$CIRCLE_ARTIFACTS/build/fixml-connection-test-tool.zip)
+[JAR](https://circleci.com/api/v1/project/Eurex-Clearing-Messaging-Interfaces/FIXML-Connection-Test-Tool/latest/artifacts/0/$CIRCLE_ARTIFACTS/build/fixml-connection-test-tool.jar)
 
 ## Overview
 
