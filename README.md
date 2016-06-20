@@ -1,4 +1,12 @@
+[![CircleCI](https://circleci.com/gh/Eurex-Clearing-Messaging-Interfaces/FIXML-Connection-Test-Tool.svg?style=svg)](https://circleci.com/gh/Eurex-Clearing-Messaging-Interfaces/FIXML-Connection-Test-Tool)
+
 # FIXML Connection Test Tool
+
+## Download
+- Latest completed build - [ZIP file](https://circleci.com/api/v1/project/Eurex-Clearing-Messaging-Interfaces/FIXML-Connection-Test-Tool/latest/artifacts/0/$CIRCLE_ARTIFACTS/build/fixml-connection-test-tool.zip)
+- Latest completed build - [JAR file](https://circleci.com/api/v1/project/Eurex-Clearing-Messaging-Interfaces/FIXML-Connection-Test-Tool/latest/artifacts/0/$CIRCLE_ARTIFACTS/build/fixml-connection-test-tool.jar)
+
+## Overview
 
 FIXML Connection Test Tool is a simple Java tool, which provides two basic functionalities:
 
