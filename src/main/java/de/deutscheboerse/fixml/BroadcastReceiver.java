@@ -1,21 +1,20 @@
-/******************************************************************************** 
+/********************************************************************************
  *
  * DESCRIPTION:  FIXML Connection Test Tool - tool for receiving and sending AMQP
  *                                            messages via SSL broker interface
  *
  ********************************************************************************
  */
-
 package de.deutscheboerse.fixml;
+
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.ParseException;
+import org.slf4j.LoggerFactory;
 
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.naming.NamingException;
-
-import org.apache.commons.cli.GnuParser;
-import org.apache.commons.cli.ParseException;
-import org.slf4j.LoggerFactory;
 
 /**
  * Broadcast Receiver receives broadcasts from a persistent broadcast queue
@@ -27,24 +26,8 @@ public class BroadcastReceiver extends BrokerConnector
     public BroadcastReceiver(final BroadcastReceiverOptions options)
     {
         super(options);
-        this.logger = LoggerFactory.getLogger(BroadcastReceiver.class);
-        String bcastString;
-        switch (this.options.amqpVersion)
-        {
-        case AMQP_0_10:
-            bcastString = String.format("broadcast.%s.%s; { node: { type: queue }, create: never," +
-                    "assert: never, mode: %s }", options.accountID, options.streamID,
-                    options.consume ? "consume" : "browse");
-            this.properties.setProperty("destination.broadcastAddress", bcastString);            
-            break;
-        case AMQP_1_0:
-            bcastString = String.format("broadcast.%s.%s", options.accountID, options.streamID);
-            this.properties.setProperty("queue.broadcastAddress", bcastString);   
-            break;
-        default:
-            this.logger.error("Unknown AMQP version '" + this.options.amqpVersion + "', broadcastAddress is not set");
-            break;
-        }
+        logger = LoggerFactory.getLogger(BroadcastReceiver.class);
+        properties.setProperty("queue.broadcastAddress", String.format("broadcast.%s.%s", options.accountID, options.streamID));
     }
 
     public void connect() throws JMSException, HandledException, NamingException
@@ -54,25 +37,25 @@ public class BroadcastReceiver extends BrokerConnector
         super.connect();
         try
         {
-            broadcastDestination = (Destination) ctx.lookup("broadcastAddress");
-            this.broadcastConsumer = this.session.createConsumer(broadcastDestination);
-            this.logger.info("Broadcast consumer created");
+            broadcastDestination = (Destination) context.lookup("broadcastAddress");
+            broadcastConsumer = session.createConsumer(broadcastDestination);
+            logger.info("Broadcast consumer created");
         }
-        catch (JMSException ex)
+        catch (JMSException e)
         {
-            this.logger.error("Failed to create consumer");
-            throw ex;
+            logger.error("Failed to create consumer");
+            throw e;
         }
-        catch (NamingException ex)
+        catch (NamingException e)
         {
-            this.logger.error("Failed to prepare the destinations");
-            throw ex;
+            logger.error("Failed to prepare the destinations");
+            throw e;
         }
     }
 
     public void consumeMessage() throws JMSException
     {
-        super.consumeMessage(this.broadcastConsumer, false);
+        super.consumeMessage(broadcastConsumer, false);
     }
 
     public static void main(String[] args) throws JMSException, NamingException
@@ -80,13 +63,13 @@ public class BroadcastReceiver extends BrokerConnector
         BroadcastReceiverOptions options = new BroadcastReceiverOptions();
         try
         {
-            options.parse(new GnuParser(), args);
+            options.parse(new DefaultParser(), args);
             options.printReceivedOptions();
-            try (BroadcastReceiver obj = new BroadcastReceiver(options);)
+            try (BroadcastReceiver broadcastReceiver = new BroadcastReceiver(options))
             {
-                obj.checkCertStores();
-                obj.connect();
-                obj.consumeMessage();
+                broadcastReceiver.checkCertStores();
+                broadcastReceiver.connect();
+                broadcastReceiver.consumeMessage();
             }
             catch (HandledException e)
             {

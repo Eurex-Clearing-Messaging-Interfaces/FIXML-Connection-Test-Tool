@@ -19,11 +19,12 @@ It was designed as a connection tool for members, since the Java SSL debugging c
 
 ## Requirements
 
-The FIXML Connection Test Tool is developed using Java 1.7.x. Functionality under older or newer versions of Java is not tested. The tool has been tested on both Windows and Linux - it is expected to run without issues on all platforms with official Java support (e.g. Solaris). The tool doesn't have any kind of GUI. That allows its execution on machines without a graphical user interface.
+The FIXML Connection Test Tool is developed using Java 1.8. Functionality under older or newer versions of Java is not tested. The tool has been tested on both Windows and Linux - it is expected to run without issues on all platforms with official Java support (e.g. Solaris). The tool doesn't have any kind of GUI. That allows its execution on machines without a graphical user interface.
 
 ## Used API
 
-The FIXML Connection Test Tool is based on Java API from the Apache Qpid project ( http://qpid.apache.org ), version 0.32 (AMQP 0-10) and 0.5.0 (AMQP 1.0). All necessary components are distributed as part of the ZIP file in the "lib" sub-directory. The code used in the FIXML Connection Test Tool is described in the Eurex Clearing FIXML Interface specification, Volume 2-B: AMQP Programming Guide, which is available in the document section of the Eurex website ( http://www.eurexclearing.com/clearing-en/technology/eurex-release14/system-documentation/system-documentation/861464?frag=861450 ).
+The FIXML Connection Test Tool is based on Java API from the Apache Qpid project ( http://qpid.apache.org ), version 0.52.0. All necessary components are distributed as part of the ZIP file in the "lib" sub-directory. 
+The code used in the FIXML Connection Test Tool is described in the Eurex Clearing FIXML Interface specification, Volume 2-B: AMQP Programming Guide, which is available in the document section of the Eurex website ( https://www.eurexclearing.com/clearing-en/technology/c7/system-documentation-c7/System-documentation-31378?frag=246932 ).
 
 ## Installation
 
@@ -35,7 +36,7 @@ Unzip the archive content into a destination directory. Under Linux, it is neces
 
 From the unzipped archive execute either `./broadcast-receiver.sh` (Linux) / `broadcast-receiver.bat` (Windows) for testing the broadcast functionality or `./request-responder.sh` (Linux) / `request-responder.bat` (Windows) for testing the request/response functionality. This will print all the available command line parameters. Parameters with an additional value may be written as `--param=value` or `--param value`.
 
-### Mandatory parameters for both modes
+### Mandatory parameters
 - **--account <account name>** Member account ID
 - **--host <host name/IP addr>** AMQP broker host name or IP address
 - **--port <port number>** AMQP SSL broker port number
@@ -44,8 +45,7 @@ From the unzipped archive execute either `./broadcast-receiver.sh` (Linux) / `br
 - **--keystore <store file>** JKS store file with member account private key(s)
 - **--keystore-password <password>** Password protecting the keystore
 
-### Optional parameters for both modes
-- **--amqp-version <AMQP protocol version>** AMQP protocol version (default: 0-10; other possibilities: 1.0)
+### Optional parameters
 - **--key-alias <alias>** Alias of the private key to be used (default: same as account name in lower-case)
 - **--log-level <level>** Logging level (default: INFO; other possibilities: ERROR, WARNING, DEBUG, TRACE)
 - **--ssl-debug** Enable detailed SSL logging (default: off)
@@ -53,7 +53,6 @@ From the unzipped archive execute either `./broadcast-receiver.sh` (Linux) / `br
 - **--timeout <time-out in ms>** How long to wait for a message (default: 1000)
 
 ### Optional parameters for broadcast-receiver
-- **--consume** Consume the message from the broker queue instead of just peeking at it (default: off)
 - **--stream <stream name>** Broadcast stream to read from (default: TradeConfirmation)
 
 ### Optional parameters for request-responder
@@ -63,7 +62,7 @@ From the unzipped archive execute either `./broadcast-receiver.sh` (Linux) / `br
 
 
 ## Example
-    ./broadcast-receive.sh --account=CBKFR_CBKFRALMMACC1 --host=ecag-fixml-simu1.deutsche-boerse.com --port=10170 --keystore=CBKFR_CBKFRALMMACC1.keystore --keystore-password=123456 --truststore=truststore --truststore-password=123456 --verify-hostname
+    ./broadcast-receiver.sh --account=CBKFR_CBKFRALMMACC1 --host=ecag-fixml-simu1.deutsche-boerse.com --port=10170 --keystore=CBKFR_CBKFRALMMACC1.keystore --keystore-password=123456 --truststore=truststore --truststore-password=123456 --verify-hostname
 
 ### Output
 
@@ -484,30 +483,6 @@ following error message is expected ("Signature does not match" exception):
 		at sun.security.provider.certpath.BasicChecker.check(BasicChecker.java:112)
 		at sun.security.provider.certpath.PKIXMasterCertPathValidator.validate(PKIXMasterCertPathValidator.java:117)
 		... 33 more
-
-### Error - Connecting with AMQP 1.0 client to AMQP 0-10
-When client is configured as AMQP 1.0 client and server is AMQP 0-10, the following error message is expected at the end of output("Transport connection remotely closed." exception):
-
-    2015-09-10 09:57:42 +0200 [main] ERROR de.deutscheboerse.fixml.BroadcastReceiver - Failed to connect or create a session
-    2015-09-10 09:57:42 +0200 [main] INFO de.deutscheboerse.fixml.BroadcastReceiver - Disconnected
-    Exception in thread "main" javax.jms.JMSException: Transport connection remotely closed.
-        at org.apache.qpid.jms.exceptions.JmsExceptionSupport.create(JmsExceptionSupport.java:66)
-        at org.apache.qpid.jms.exceptions.JmsExceptionSupport.create(JmsExceptionSupport.java:88)
-        at org.apache.qpid.jms.JmsConnection.createResource(JmsConnection.java:615)
-        at org.apache.qpid.jms.JmsConnection.connect(JmsConnection.java:522)
-        at org.apache.qpid.jms.JmsConnection.createSession(JmsConnection.java:251)
-        at de.deutscheboerse.fixml.BrokerConnector.connect(BrokerConnector.java:151)
-        at de.deutscheboerse.fixml.BroadcastReceiver.connect(BroadcastReceiver.java:65)
-        at de.deutscheboerse.fixml.BroadcastReceiver.main(BroadcastReceiver.java:99)
-    Caused by: java.io.IOException: Transport connection remotely closed.
-        at org.apache.qpid.jms.provider.amqp.AmqpProvider$19.run(AmqpProvider.java:752)
-        at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:471)
-        at java.util.concurrent.FutureTask.run(FutureTask.java:262)
-        at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.access$201(ScheduledThreadPoolExecutor.java:178)
-        at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:292)
-        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
-        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:615)
-        at java.lang.Thread.run(Thread.java:744)
 
 ## Example
     ./request-response.sh --account=CBKFR_CBKFRALMMACC1 --host=ecag-fixml-simu1.deutsche-boerse.com --port=10170 --keystore=CBKFR_CBKFRALMMACC1.keystore --keystore-password=123456 --truststore=truststore --truststore-password=123456 --verify-hostname
