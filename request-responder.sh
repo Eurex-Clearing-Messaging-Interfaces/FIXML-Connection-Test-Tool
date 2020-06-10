@@ -1,3 +1,3 @@
 #!/bin/bash
-myPath="$(dirname $(readlink -f ${BASH_SOURCE[0]}))"
-java -cp ${myPath}/lib/fixml-connection-test-tool.jar de.deutscheboerse.fixml.RequestResponder $*
+readonly MY_PATH="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
+java -cp "$MY_PATH/lib/fixml-connection-test-tool.jar" "de.deutscheboerse.fixml.RequestResponder" "$@"

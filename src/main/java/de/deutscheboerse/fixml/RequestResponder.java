@@ -1,18 +1,15 @@
-/******************************************************************************** 
+/********************************************************************************
  *
  * DESCRIPTION:  FIXML Connection Test Tool - tool for receiving and sending AMQP
  *                                            messages via SSL broker interface
  *
  ********************************************************************************
  */
-
 package de.deutscheboerse.fixml;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.InputStreamReader;
-import java.util.Scanner;
-import java.util.UUID;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.ParseException;
+import org.slf4j.LoggerFactory;
 
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -20,14 +17,16 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.TextMessage;
 import javax.naming.NamingException;
-
-import org.apache.commons.cli.GnuParser;
-import org.apache.commons.cli.ParseException;
-import org.slf4j.LoggerFactory;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
+import java.util.UUID;
 
 /**
  * RequestResponder creates temporary response queue, sends request message and
- * receives the response message from the response queue. 
+ * receives the response message from the response queue.
  */
 public class RequestResponder extends BrokerConnector
 {
@@ -35,113 +34,91 @@ public class RequestResponder extends BrokerConnector
     private MessageProducer requestProducer;
     private Destination replyDestination;
     private String msgContent;
-    
+
     public RequestResponder(final RequestResponderOptions options) throws FileNotFoundException
     {
         super(options);
-        this.logger = LoggerFactory.getLogger(RequestResponder.class);
-        if (options.msgContentFileName == null)
+        logger = LoggerFactory.getLogger(RequestResponder.class);
+        final String input = options.msgContentFileName;
+        if (input == null)
         {
-            this.msgContent = options.msgContent;
+            msgContent = options.msgContent;
         }
         else
         {
-            String contentOrigin = "STDIN".equals(options.msgContentFileName) ? "from the STDIN ... " : "of the file " + options.msgContentFileName;
-            try (Scanner scanner = new Scanner(
-                 "STDIN".equals(options.msgContentFileName) ? new InputStreamReader(System.in) : new FileReader(options.msgContentFileName)))
+            String contentOrigin = "STDIN".equals(input) ? "from the STDIN ... " : "of the file " + input;
+            try (Scanner scanner = new Scanner(new InputStreamReader("STDIN".equals(input) ? System.in : new FileInputStream(input), StandardCharsets.UTF_8)))
             {
-                this.logger.info("Reading content " + contentOrigin);
+                logger.info("Reading content " + contentOrigin);
                 scanner.useDelimiter("\\z");
-                this.msgContent = scanner.next();
+                msgContent = scanner.next();
             }
-            catch (FileNotFoundException ex)
+            catch (FileNotFoundException e)
             {
-                this.logger.error("Unable to open file " + options.msgContentFileName);
-                throw ex;
+                logger.error("Unable to open file " + input);
+                throw e;
             }
         }
         String requestString;
         String replyString;
         String responseString;
-        switch (this.options.amqpVersion)
-        {
-        case AMQP_0_10:
-            requestString = String.format("request.%s; { node: { type: topic }, create: never }", options.accountID);
-            replyString = String.format("response/response.%s.fixml-connection-test-tool; { create: receiver, node: { type: topic } }", 
-                    options.accountID);
-            responseString = String.format("response.%s.fixml-connection-test-tool; {create: receiver, assert: never, node: " +
-                    "{ type: queue, x-declare: { auto-delete: true, exclusive: false, arguments:" +
-                    "{'qpid.auto_delete_timeout': 60, 'qpid.policy_type': ring, 'qpid.max_count': 1000," +
-                    "'qpid.max_size': 1000000}}, x-bindings: [{exchange: 'response', queue: " +
-                    "'response.%s.fixml-connection-test-tool', key: 'response.%s.fixml-connection-test-tool'}]}}",
-                    options.accountID, options.accountID, options.accountID);
-            this.properties.setProperty("destination.requestAddress", requestString);
-            this.properties.setProperty("destination.replyAddress", replyString);
-            this.properties.setProperty("destination.responseAddress", responseString);
-            break;
-        case AMQP_1_0:
-            requestString = String.format("request.%s", options.accountID);
-            replyString = String.format("response/response.%s", options.accountID);
-            responseString = String.format("response.%s",options.accountID);
-            this.properties.setProperty("topic.requestAddress", requestString);
-            this.properties.setProperty("topic.replyAddress", replyString);
-            this.properties.setProperty("queue.responseAddress", responseString);
-            break;
-        default:
-            this.logger.error("Unknown AMQP version '" + this.options.amqpVersion + "', requestAddress, replyAddress or responseAddress are not set");
-            break;
-        }
+        requestString = String.format("request.%s", options.accountID);
+        replyString = String.format("response/response.%s", options.accountID);
+        responseString = String.format("response.%s", options.accountID);
+        properties.setProperty("topic.requestAddress", requestString);
+        properties.setProperty("topic.replyAddress", replyString);
+        properties.setProperty("queue.responseAddress", responseString);
     }
 
     public void connect() throws NamingException, JMSException, HandledException
     {
         Destination responseDestination;
         Destination requestDestination;
-        
+
         super.connect();
         try
         {
-            responseDestination = (Destination) ctx.lookup("responseAddress");
-            requestDestination = (Destination) ctx.lookup("requestAddress");
-            this.replyDestination = (Destination) ctx.lookup("replyAddress");
-            this.responseConsumer = this.session.createConsumer(responseDestination);
-            this.logger.info("Response consumer created");
-            this.requestProducer = this.session.createProducer(requestDestination);
-            this.logger.info("Request producer created");
+            responseDestination = (Destination) context.lookup("responseAddress");
+            requestDestination = (Destination) context.lookup("requestAddress");
+            replyDestination = (Destination) context.lookup("replyAddress");
+            responseConsumer = session.createConsumer(responseDestination);
+            logger.info("Response consumer created");
+            requestProducer = session.createProducer(requestDestination);
+            logger.info("Request producer created");
         }
-        catch (JMSException ex)
+        catch (JMSException e)
         {
-            this.logger.error("Failed to create sender or consumer");
-            throw ex;
+            logger.error("Failed to create sender or consumer");
+            throw e;
         }
-        catch (NamingException ex)
+        catch (NamingException e)
         {
-            this.logger.error("Failed to prepare the destinations");
-            throw ex;
+            logger.error("Failed to prepare the destinations");
+            throw e;
         }
     }
-    
+
     public void produceMessage() throws JMSException
     {
         TextMessage message;
         try
         {
-            message = session.createTextMessage(this.msgContent);
-            message.setJMSReplyTo(this.replyDestination);
+            message = session.createTextMessage(msgContent);
+            message.setJMSReplyTo(replyDestination);
             message.setJMSCorrelationID(UUID.randomUUID().toString());
             requestProducer.send(message);
-            this.logger.info("Request message sent");
+            logger.info("Request message sent");
         }
-        catch (JMSException ex)
+        catch (JMSException e)
         {
-            this.logger.error("Failed to send message");
-            throw ex;
+            logger.error("Failed to send message");
+            throw e;
         }
     }
-    
+
     public void consumeMessage() throws JMSException
     {
-        super.consumeMessage(this.responseConsumer, true);
+        super.consumeMessage(responseConsumer, true);
     }
 
     public static void main(String[] args) throws FileNotFoundException, JMSException, NamingException
@@ -149,14 +126,14 @@ public class RequestResponder extends BrokerConnector
         RequestResponderOptions options = new RequestResponderOptions();
         try
         {
-            options.parse(new GnuParser(), args);
+            options.parse(new DefaultParser(), args);
             options.printReceivedOptions();
-            try (RequestResponder obj = new RequestResponder(options))
+            try (RequestResponder requestResponder = new RequestResponder(options))
             {
-                obj.checkCertStores();
-                obj.connect();
-                obj.produceMessage();
-                obj.consumeMessage();
+                requestResponder.checkCertStores();
+                requestResponder.connect();
+                requestResponder.produceMessage();
+                requestResponder.consumeMessage();
             }
             catch (HandledException e)
             {
