@@ -7,7 +7,6 @@
  */
 package de.deutscheboerse.fixml;
 
-import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.ParseException;
 
 public class RequestResponderOptions extends CommonOptions
@@ -25,9 +24,9 @@ public class RequestResponderOptions extends CommonOptions
         addOption(MSG_CONTENT_FILE, "File name the content of the message should be read from. To read from standard input use STDIN name.", "message content file");
     }
 
-    public void parse(final CommandLineParser parser, String[] args) throws ParseException
+    public void parse(String[] args) throws ParseException
     {
-        super.parse(parser, args);
+        super.parse(args);
         if (line.hasOption(MSG_CONTENT))
         {
             msgContent = line.getOptionValue(MSG_CONTENT);

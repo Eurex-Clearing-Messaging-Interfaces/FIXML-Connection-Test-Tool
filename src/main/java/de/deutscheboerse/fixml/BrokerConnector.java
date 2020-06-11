@@ -37,7 +37,7 @@ public abstract class BrokerConnector implements Closeable
     protected enum StoreType
     {keystore, truststore}
 
-    protected final Properties properties;
+    protected final Properties properties = new Properties();
     protected InitialContext context;
     protected Logger logger;
     protected final CommonOptions options;
@@ -49,34 +49,33 @@ public abstract class BrokerConnector implements Closeable
         // create logger
         logger = LoggerFactory.getLogger(BrokerConnector.class);
         this.options = options;
-        properties = new Properties();
         properties.setProperty("java.naming.factory.initial", "org.apache.qpid.jms.jndi.JmsInitialContextFactory");
-        String brokerConnStr = String.format("amqps://%s:%d?transport.keyStoreLocation=%s&transport.keyStorePassword=%s&" +
+        final String brokerConnectionString = String.format("amqps://%s:%d?transport.keyStoreLocation=%s&transport.keyStorePassword=%s&" +
                         "transport.trustStoreLocation=%s&transport.trustStorePassword=%s&transport.keyAlias=%s&transport.verifyHost=%s",
                 options.hostname, options.port, System.getProperty("javax.net.ssl.keyStore"),
                 System.getProperty("javax.net.ssl.keyStorePassword"), System.getProperty("javax.net.ssl.trustStore"),
                 System.getProperty("javax.net.ssl.trustStorePassword"), options.privateKeyAlias,
                 options.verifyHostname);
-        properties.setProperty("connectionfactory.connection", brokerConnStr);
+        properties.setProperty("connectionfactory.connection", brokerConnectionString);
     }
 
-    protected void checkCertStores() throws HandledException
+    protected void checkCertificateStores() throws HandledException
     {
         logger.info("Checking truststore and keystore.");
         logger.info("Checking truststore:");
-        checkCertStore(System.getProperty("javax.net.ssl.trustStore"), System.getProperty("javax.net.ssl.trustStorePassword"), StoreType.truststore);
+        checkCertificateStore(System.getProperty("javax.net.ssl.trustStore"), System.getProperty("javax.net.ssl.trustStorePassword"), StoreType.truststore);
         logger.info("Truststore check passed.");
         logger.info("Checking truststore:");
-        checkCertStore(System.getProperty("javax.net.ssl.keyStore"), System.getProperty("javax.net.ssl.keyStorePassword"), StoreType.keystore);
+        checkCertificateStore(System.getProperty("javax.net.ssl.keyStore"), System.getProperty("javax.net.ssl.keyStorePassword"), StoreType.keystore);
         logger.info("Keystore check passed.");
         logger.info("Truststore and keystore check passed.");
     }
 
-    protected void checkCertStore(String storePath, String storePassword, StoreType storeType) throws HandledException
+    protected void checkCertificateStore(String storePath, String storePassword, StoreType storeType) throws HandledException
     {
-        try (InputStream inputStream = new FileInputStream(storePath))
+        try (final InputStream inputStream = new FileInputStream(storePath))
         {
-            KeyStore keyStore = KeyStore.getInstance("JKS");
+            final KeyStore keyStore = KeyStore.getInstance("JKS");
             keyStore.load(inputStream, storePassword.toCharArray());
             if (storeType == StoreType.keystore)
             {
@@ -86,10 +85,10 @@ public abstract class BrokerConnector implements Closeable
                 }
             }
             logger.info("Printing out " + storeType + " file '" + storePath + "':");
-            boolean checkHostnames = (storeType == StoreType.truststore) && options.verifyHostname;
+            final boolean checkHostnames = (storeType == StoreType.truststore) && options.verifyHostname;
             boolean hostnameFoundInCertificate = false;
             // print out store certificates
-            Enumeration<String> enumeration = keyStore.aliases();
+            final Enumeration<String> enumeration = keyStore.aliases();
             while (enumeration.hasMoreElements())
             {
                 String alias = enumeration.nextElement();
@@ -114,11 +113,10 @@ public abstract class BrokerConnector implements Closeable
 
     protected void connect() throws JMSException, HandledException, NamingException
     {
-        ConnectionFactory connectionFactory;
         try
         {
             context = new InitialContext(properties);
-            connectionFactory = (ConnectionFactory) context.lookup("connection");
+            final ConnectionFactory connectionFactory = (ConnectionFactory) context.lookup("connection");
             try
             {
                 connection = connectionFactory.createConnection();
@@ -143,15 +141,15 @@ public abstract class BrokerConnector implements Closeable
         }
     }
 
-    protected void consumeMessage(final MessageConsumer messageConsumer, boolean errorOnNoMsg) throws JMSException
+    protected void consumeMessage(final MessageConsumer messageConsumer, boolean errorOnNoMessage) throws JMSException
     {
         try
         {
-            Message msg = messageConsumer.receive(options.timeout);
+            final Message message = messageConsumer.receive(options.timeout);
 
-            if (msg == null)
+            if (message == null)
             {
-                if (errorOnNoMsg)
+                if (errorOnNoMessage)
                 {
                     logger.error("No message received");
                 }
@@ -161,31 +159,31 @@ public abstract class BrokerConnector implements Closeable
                 }
 
             }
-            else if (msg instanceof TextMessage)
+            else if (message instanceof TextMessage)
             {
-                TextMessage textMessage = (TextMessage) msg;
-                String messageBody = textMessage.getText();
-                msg.acknowledge();
+                final TextMessage textMessage = (TextMessage) message;
+                final String messageBody = textMessage.getText();
+                message.acknowledge();
                 logger.info("Text message received, length = " + messageBody.length() + ", content:\n" + messageBody);
             }
-            else if (msg instanceof BytesMessage)
+            else if (message instanceof BytesMessage)
             {
                 // convert byte buffer to a String first
-                BytesMessage bytesMessage = (BytesMessage) msg;
-                StringBuilder builder = new StringBuilder();
+                final BytesMessage bytesMessage = (BytesMessage) message;
+                final StringBuilder builder = new StringBuilder();
 
                 for (int i = 0; i < bytesMessage.getBodyLength(); i++)
                 {
                     builder.append((char) bytesMessage.readByte());
                 }
 
-                msg.acknowledge();
+                message.acknowledge();
                 logger.info("Byte message received, length = " + bytesMessage.getBodyLength() + ", content:\n" + builder.toString());
             }
             else
             {
                 logger.error("Message of unexpected type received");
-                msg.acknowledge();
+                message.acknowledge();
             }
         }
         catch (JMSException e)

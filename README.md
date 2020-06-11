@@ -47,7 +47,7 @@ From the unzipped archive execute either `./broadcast-receiver.sh` (Linux) / `br
 
 ### Optional parameters
 - **--key-alias <alias>** Alias of the private key to be used (default: same as account name in lower-case)
-- **--log-level <level>** Logging level (default: INFO; other possibilities: ERROR, WARNING, DEBUG, TRACE)
+- **--log-level <level>** Logging level (default: INFO; other possibilities: ERROR, WARN, DEBUG, TRACE)
 - **--ssl-debug** Enable detailed SSL logging (default: off)
 - **--verify-hostname** Verify remote host identity (default: off)
 - **--timeout <time-out in ms>** How long to wait for a message (default: 1000)

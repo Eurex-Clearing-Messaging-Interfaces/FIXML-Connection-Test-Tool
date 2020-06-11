@@ -7,7 +7,6 @@
  */
 package de.deutscheboerse.fixml;
 
-import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.LoggerFactory;
 
@@ -46,8 +45,8 @@ public class RequestResponder extends BrokerConnector
         }
         else
         {
-            String contentOrigin = "STDIN".equals(input) ? "from the STDIN ... " : "of the file " + input;
-            try (Scanner scanner = new Scanner(new InputStreamReader("STDIN".equals(input) ? System.in : new FileInputStream(input), StandardCharsets.UTF_8)))
+            final String contentOrigin = "STDIN".equals(input) ? "from the STDIN ... " : "of the file " + input;
+            try (final Scanner scanner = new Scanner(new InputStreamReader("STDIN".equals(input) ? System.in : new FileInputStream(input), StandardCharsets.UTF_8)))
             {
                 logger.info("Reading content " + contentOrigin);
                 scanner.useDelimiter("\\z");
@@ -59,27 +58,18 @@ public class RequestResponder extends BrokerConnector
                 throw e;
             }
         }
-        String requestString;
-        String replyString;
-        String responseString;
-        requestString = String.format("request.%s", options.accountID);
-        replyString = String.format("response/response.%s", options.accountID);
-        responseString = String.format("response.%s", options.accountID);
-        properties.setProperty("topic.requestAddress", requestString);
-        properties.setProperty("topic.replyAddress", replyString);
-        properties.setProperty("queue.responseAddress", responseString);
+        properties.setProperty("topic.requestAddress", "request." + options.accountID);
+        properties.setProperty("topic.replyAddress", "response/response." + options.accountID);
+        properties.setProperty("queue.responseAddress", "response." + options.accountID);
     }
 
     public void connect() throws NamingException, JMSException, HandledException
     {
-        Destination responseDestination;
-        Destination requestDestination;
-
         super.connect();
         try
         {
-            responseDestination = (Destination) context.lookup("responseAddress");
-            requestDestination = (Destination) context.lookup("requestAddress");
+            final Destination responseDestination = (Destination) context.lookup("responseAddress");
+            final Destination requestDestination = (Destination) context.lookup("requestAddress");
             replyDestination = (Destination) context.lookup("replyAddress");
             responseConsumer = session.createConsumer(responseDestination);
             logger.info("Response consumer created");
@@ -100,10 +90,9 @@ public class RequestResponder extends BrokerConnector
 
     public void produceMessage() throws JMSException
     {
-        TextMessage message;
         try
         {
-            message = session.createTextMessage(msgContent);
+            final TextMessage message = session.createTextMessage(msgContent);
             message.setJMSReplyTo(replyDestination);
             message.setJMSCorrelationID(UUID.randomUUID().toString());
             requestProducer.send(message);
@@ -123,14 +112,14 @@ public class RequestResponder extends BrokerConnector
 
     public static void main(String[] args) throws FileNotFoundException, JMSException, NamingException
     {
-        RequestResponderOptions options = new RequestResponderOptions();
+        final RequestResponderOptions options = new RequestResponderOptions();
         try
         {
-            options.parse(new DefaultParser(), args);
+            options.parse(args);
             options.printReceivedOptions();
-            try (RequestResponder requestResponder = new RequestResponder(options))
+            try (final RequestResponder requestResponder = new RequestResponder(options))
             {
-                requestResponder.checkCertStores();
+                requestResponder.checkCertificateStores();
                 requestResponder.connect();
                 requestResponder.produceMessage();
                 requestResponder.consumeMessage();
