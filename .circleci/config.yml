@@ -1,9 +1,11 @@
-version: 2.1
+version: 2
 
-orbs:
-  maven: circleci/maven@0.0.12
+jobs: # a collection of steps
 
-workflows:
-  maven_test:
-    jobs:
-      - maven/test # checkout, build, test, and upload test results
+  build: # runs not using Workflows must have a `build` job as entry point
+
+    working_directory: ~/circleci/fixml-connection-test-tool
+
+    steps: # a collection of executable commands
+
+      - run: mvn clean package
