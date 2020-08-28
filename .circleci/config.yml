@@ -8,3 +8,5 @@ jobs:
       - run: mvn clean package
       - run: pwd
       - run: ls
+      - store_artifacts: 
+          path: /home/circleci/project/target/fixml-connection-test-tool.zip
