@@ -7,7 +7,6 @@
  */
 package de.deutscheboerse.fixml;
 
-import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.LoggerFactory;
 
@@ -32,12 +31,10 @@ public class BroadcastReceiver extends BrokerConnector
 
     public void connect() throws JMSException, HandledException, NamingException
     {
-        Destination broadcastDestination;
-
         super.connect();
         try
         {
-            broadcastDestination = (Destination) context.lookup("broadcastAddress");
+            final Destination broadcastDestination = (Destination) context.lookup("broadcastAddress");
             broadcastConsumer = session.createConsumer(broadcastDestination);
             logger.info("Broadcast consumer created");
         }
@@ -60,14 +57,14 @@ public class BroadcastReceiver extends BrokerConnector
 
     public static void main(String[] args) throws JMSException, NamingException
     {
-        BroadcastReceiverOptions options = new BroadcastReceiverOptions();
+        final BroadcastReceiverOptions options = new BroadcastReceiverOptions();
         try
         {
-            options.parse(new DefaultParser(), args);
+            options.parse(args);
             options.printReceivedOptions();
-            try (BroadcastReceiver broadcastReceiver = new BroadcastReceiver(options))
+            try (final BroadcastReceiver broadcastReceiver = new BroadcastReceiver(options))
             {
-                broadcastReceiver.checkCertStores();
+                broadcastReceiver.checkCertificateStores();
                 broadcastReceiver.connect();
                 broadcastReceiver.consumeMessage();
             }

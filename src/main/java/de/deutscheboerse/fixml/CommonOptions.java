@@ -9,6 +9,7 @@ package de.deutscheboerse.fixml;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
@@ -34,7 +35,7 @@ public abstract class CommonOptions
     protected static final String TIMEOUT = "timeout";
 
     protected final Options options = new Options();
-    protected CommandLineParser parser;
+    protected final CommandLineParser parser = new DefaultParser();
     protected CommandLine line;
 
     public int timeout = 1000;
@@ -58,14 +59,14 @@ public abstract class CommonOptions
         addOption(KEY_ALIAS, "Alias of the private key to be used (default: same as account name in lower-case)", "alias");
         addOption(VERIFY_HOSTNAME, "Verify remote host identity (default: " + (verifyHostname ? "on)" : "off)"));
         addOption(SSL_DEBUG, "Detailed SSL logging (default: off)");
-        addOption(LOG_LEVEL, "Logging level (default: INFO; other possibilities: ERROR, WARNING, DEBUG, TRACE)", "level");
+        addOption(LOG_LEVEL, "Logging level (default: INFO; other possibilities: ERROR, WARN, DEBUG, TRACE)", "level");
         addOption(TIMEOUT, "How long to wait for a message (default: " + timeout + ")", "time-out in ms");
     }
 
     public void printReceivedOptions()
     {
         final StringBuilder sb = new StringBuilder();
-        for (Option option : line.getOptions())
+        for (final Option option : line.getOptions())
         {
             sb.append(" --").append(option.getLongOpt());
             sb.append(option.hasArg() ? "=" + option.getValue() : "");
@@ -73,9 +74,8 @@ public abstract class CommonOptions
         LoggerFactory.getLogger(CommonOptions.class).info("Received options:" + sb);
     }
 
-    public void parse(final CommandLineParser parser, String[] args) throws ParseException
+    public void parse(String[] args) throws ParseException
     {
-        this.parser = parser;
         line = parser.parse(options, args, false);
         if (line.hasOption(LOG_LEVEL))
         {
@@ -153,8 +153,8 @@ public abstract class CommonOptions
 
     public void printHelp()
     {
-        HelpFormatter formatter = new HelpFormatter();
-        formatter.setWidth(120);
+        final HelpFormatter formatter = new HelpFormatter();
+        formatter.setWidth(180);
         formatter.printHelp("~this~ <param1> [param2] ...", options);
     }
 

@@ -7,7 +7,6 @@
  */
 package de.deutscheboerse.fixml;
 
-import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.ParseException;
 
 public class BroadcastReceiverOptions extends CommonOptions
@@ -22,9 +21,9 @@ public class BroadcastReceiverOptions extends CommonOptions
         addOption(STREAM, "Broadcast stream to read from (default: " + streamID + ")", "stream name");
     }
 
-    public void parse(final CommandLineParser parser, String[] args) throws ParseException
+    public void parse(String[] args) throws ParseException
     {
-        super.parse(parser, args);
+        super.parse(args);
         if (line.hasOption(STREAM))
         {
             streamID = line.getOptionValue(STREAM);
