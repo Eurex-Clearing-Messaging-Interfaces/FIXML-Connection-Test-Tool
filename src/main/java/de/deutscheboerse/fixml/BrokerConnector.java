@@ -1,23 +1,14 @@
-/******************************************************************************** 
+/********************************************************************************
  *
  * DESCRIPTION:  FIXML Connection Test Tool - tool for receiving and sending AMQP
  *                                            messages via SSL broker interface
  *
  ********************************************************************************
  */
-
 package de.deutscheboerse.fixml;
 
-import java.io.Closeable;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.util.Enumeration;
-import java.util.Properties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.jms.BytesMessage;
 import javax.jms.Connection;
@@ -29,195 +20,176 @@ import javax.jms.Session;
 import javax.jms.TextMessage;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-
-import org.apache.qpid.AMQConnectionFailureException;
-import org.apache.qpid.AMQUnresolvedAddressException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.Closeable;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.util.Enumeration;
+import java.util.Properties;
 
 public abstract class BrokerConnector implements Closeable
 {
-    protected static enum StoreType { keystore, truststore }
-    protected Properties properties;
-    protected InitialContext ctx;
+    protected enum StoreType
+    {keystore, truststore}
+
+    protected final Properties properties = new Properties();
+    protected InitialContext context;
     protected Logger logger;
-    protected CommonOptions options;
+    protected final CommonOptions options;
     protected Connection connection;
     protected Session session;
 
     public BrokerConnector(final CommonOptions options)
     {
         // create logger
-        this.logger = LoggerFactory.getLogger(BrokerConnector.class);
+        logger = LoggerFactory.getLogger(BrokerConnector.class);
         this.options = options;
-        this.properties = new Properties();
-        String brokerConnStr = null;
-        switch (this.options.amqpVersion)
-        {
-        case AMQP_0_10:
-            properties.setProperty("java.naming.factory.initial", "org.apache.qpid.jndi.PropertiesFileInitialContextFactory");
-            brokerConnStr = String.format("amqp://:@BcstRcvrConnTest/?brokerlist='tcp://%s:%d?ssl='true'" +
-                    "&ssl_cert_alias='%s'&sasl_mechs='EXTERNAL'&ssl_verify_hostname='%s''" +
-                    "&sync_publish='all'&sync_ack='true'&maxprefetch='1'", this.options.hostname,
-                    this.options.port, this.options.privateKeyAlias, String.valueOf(this.options.verifyHostname));
-            break;
-        case AMQP_1_0:
-            properties.setProperty("java.naming.factory.initial", "org.apache.qpid.jms.jndi.JmsInitialContextFactory");
-            brokerConnStr = String.format("amqps://%s:%d?transport.keyStoreLocation=%s&transport.keyStorePassword=%s&" +
-                    "transport.trustStoreLocation=%s&transport.trustStorePassword=%s&transport.keyAlias=%s&transport.verifyHost=%s", 
-                    this.options.hostname, this.options.port, System.getProperty("javax.net.ssl.keyStore"), 
-                    System.getProperty("javax.net.ssl.keyStorePassword"), System.getProperty("javax.net.ssl.trustStore"), 
-                    System.getProperty("javax.net.ssl.trustStorePassword"), this.options.privateKeyAlias,
-                    String.valueOf(this.options.verifyHostname));
-            break;
-        default:
-            this.logger.error("Unknown AMQP version '" + this.options.amqpVersion + "', connection string is not set");
-            break;
-        }
-        properties.setProperty("connectionfactory.connection", brokerConnStr);
+        properties.setProperty("java.naming.factory.initial", "org.apache.qpid.jms.jndi.JmsInitialContextFactory");
+        final String brokerConnectionString = String.format("amqps://%s:%d?transport.keyStoreLocation=%s&transport.keyStorePassword=%s&" +
+                        "transport.trustStoreLocation=%s&transport.trustStorePassword=%s&transport.keyAlias=%s&transport.verifyHost=%s",
+                options.hostname, options.port, System.getProperty("javax.net.ssl.keyStore"),
+                System.getProperty("javax.net.ssl.keyStorePassword"), System.getProperty("javax.net.ssl.trustStore"),
+                System.getProperty("javax.net.ssl.trustStorePassword"), options.privateKeyAlias,
+                options.verifyHostname);
+        properties.setProperty("connectionfactory.connection", brokerConnectionString);
     }
 
-    protected void checkCertStores() throws HandledException
+    protected void checkCertificateStores() throws HandledException
     {
-        this.logger.info("Checking truststore and keystore.");
-        this.logger.info("Checking truststore:");
-        checkCertStore(System.getProperty("javax.net.ssl.trustStore"), System.getProperty("javax.net.ssl.trustStorePassword"), StoreType.truststore);
-        this.logger.info("Truststore check passed.");
-        this.logger.info("Checking truststore:");
-        checkCertStore(System.getProperty("javax.net.ssl.keyStore"), System.getProperty("javax.net.ssl.keyStorePassword"), StoreType.keystore);
-        this.logger.info("Keystore check passed.");
-        this.logger.info("Truststore and keystore check passed.");
+        logger.info("Checking truststore and keystore.");
+        logger.info("Checking truststore:");
+        checkCertificateStore(System.getProperty("javax.net.ssl.trustStore"), System.getProperty("javax.net.ssl.trustStorePassword"), StoreType.truststore);
+        logger.info("Truststore check passed.");
+        logger.info("Checking truststore:");
+        checkCertificateStore(System.getProperty("javax.net.ssl.keyStore"), System.getProperty("javax.net.ssl.keyStorePassword"), StoreType.keystore);
+        logger.info("Keystore check passed.");
+        logger.info("Truststore and keystore check passed.");
     }
-    
-    protected void checkCertStore(String storePath, String storePassword, StoreType storeType) throws HandledException
+
+    protected void checkCertificateStore(String storePath, String storePassword, StoreType storeType) throws HandledException
     {
-        try
+        try (final InputStream inputStream = new FileInputStream(storePath))
         {
-            KeyStore ks = KeyStore.getInstance("JKS");
-            ks.load(new FileInputStream(storePath), storePassword.toCharArray());
+            final KeyStore keyStore = KeyStore.getInstance("JKS");
+            keyStore.load(inputStream, storePassword.toCharArray());
             if (storeType == StoreType.keystore)
             {
-                if (!ks.isKeyEntry(options.privateKeyAlias))
+                if (!keyStore.isKeyEntry(options.privateKeyAlias))
                 {
                     throw new HandledException("Alias '" + options.privateKeyAlias + "' missing in store '" + storePath + "'");
-                }   
+                }
             }
-            this.logger.info("Printing out " + storeType + " file '" + storePath + "':");
-            boolean checkHostnames = (storeType == StoreType.truststore) && this.options.verifyHostname;
+            logger.info("Printing out " + storeType + " file '" + storePath + "':");
+            final boolean checkHostnames = (storeType == StoreType.truststore) && options.verifyHostname;
             boolean hostnameFoundInCertificate = false;
             // print out store certificates
-            Enumeration<String> enumeration = ks.aliases();
-            while(enumeration.hasMoreElements()) {
+            final Enumeration<String> enumeration = keyStore.aliases();
+            while (enumeration.hasMoreElements())
+            {
                 String alias = enumeration.nextElement();
-                if (checkHostnames && alias.equals(this.options.hostname))
+                if (checkHostnames && alias.equals(options.hostname))
                 {
-                        hostnameFoundInCertificate = true;
+                    hostnameFoundInCertificate = true;
                 }
                 System.out.println("Alias name: " + alias);
-                Certificate certificate = ks.getCertificate(alias);
+                Certificate certificate = keyStore.getCertificate(alias);
                 System.out.println(certificate.toString());
             }
-            if (checkHostnames && hostnameFoundInCertificate == false)
+            if (checkHostnames && !hostnameFoundInCertificate)
             {
-                throw new HandledException("Hostname '" + this.options.hostname + "' missing in store '" + storePath + "'");
+                throw new HandledException("Hostname '" + options.hostname + "' missing in store '" + storePath + "'");
             }
         }
-        catch (IOException|KeyStoreException|CertificateException|NoSuchAlgorithmException e)
+        catch (IOException | KeyStoreException | CertificateException | NoSuchAlgorithmException e)
         {
             throw new HandledException("Error during checking '" + storePath + "', exception: " + e);
         }
     }
-    
+
     protected void connect() throws JMSException, HandledException, NamingException
     {
-        ConnectionFactory connectionFactory;
         try
         {
-            this.ctx = new InitialContext(properties);
-            connectionFactory = (ConnectionFactory) ctx.lookup("connection");
+            context = new InitialContext(properties);
+            final ConnectionFactory connectionFactory = (ConnectionFactory) context.lookup("connection");
             try
             {
-                this.connection = connectionFactory.createConnection();
-                this.session = this.connection.createSession(false, Session.CLIENT_ACKNOWLEDGE);
-                this.connection.start();
-                this.logger.info("Connected");
+                connection = connectionFactory.createConnection();
+                session = connection.createSession(false, Session.CLIENT_ACKNOWLEDGE);
+                connection.start();
+                logger.info("Connected");
             }
-            catch (JMSException ex)
+            catch (JMSException e)
             {
-                if ("Error creating connection: Connection refused".equals(ex.getMessage()))
+                if ("Error creating connection: Connection refused".equals(e.getMessage()))
                 {
-                    throw new HandledException("Broker is not running on '" + this.options.hostname + "' port '" + this.options.port + "'");
+                    throw new HandledException("Broker is not running on '" + options.hostname + "' port '" + options.port + "'");
                 }
-                else if (ex.getMessage().startsWith("Error creating connection:") && ex.getCause() instanceof AMQUnresolvedAddressException)
-                {
-                    throw new HandledException("Cannot resolve hostname '" + this.options.hostname + "'");
-                }
-                else if (ex.getMessage().startsWith("Error creating connection: port out of range:") && ex.getCause() instanceof AMQConnectionFailureException)
-                {
-                    throw new HandledException("Port out of range: '" + this.options.port + "'");
-                }
-                this.logger.error("Failed to connect or create a session");
-                throw ex;
+                logger.error("Failed to connect or create a session");
+                throw e;
             }
         }
-        catch (NamingException ex)
+        catch (NamingException e)
         {
-            this.logger.error("Failed to prepare the connection factory");
-            throw ex;
+            logger.error("Failed to prepare the connection factory");
+            throw e;
         }
     }
-    
-    protected void consumeMessage(final MessageConsumer messageConsumer, boolean errorOnNoMsg) throws JMSException
+
+    protected void consumeMessage(final MessageConsumer messageConsumer, boolean errorOnNoMessage) throws JMSException
     {
         try
         {
-            Message msg = messageConsumer.receive(this.options.timeout);
+            final Message message = messageConsumer.receive(options.timeout);
 
-            if (msg == null)
+            if (message == null)
             {
-                if (errorOnNoMsg)
+                if (errorOnNoMessage)
                 {
-                    this.logger.error("No message received");
+                    logger.error("No message received");
                 }
                 else
                 {
-                    this.logger.info("No message received");
+                    logger.info("No message received");
                 }
-                
+
             }
-            else if (msg instanceof TextMessage)
+            else if (message instanceof TextMessage)
             {
-                TextMessage textMessage = (TextMessage) msg;
-                String messageBody = textMessage.getText();
-                msg.acknowledge();
-                this.logger.info("Text message received, length = " + messageBody.length() + ", content:\n"
-                        + messageBody);
+                final TextMessage textMessage = (TextMessage) message;
+                final String messageBody = textMessage.getText();
+                message.acknowledge();
+                logger.info("Text message received, length = " + messageBody.length() + ", content:\n" + messageBody);
             }
-            else if (msg instanceof BytesMessage)
+            else if (message instanceof BytesMessage)
             {
                 // convert byte buffer to a String first
-                BytesMessage bytesMessage = (BytesMessage) msg;
-                StringBuilder builder = new StringBuilder();
+                final BytesMessage bytesMessage = (BytesMessage) message;
+                final StringBuilder builder = new StringBuilder();
 
                 for (int i = 0; i < bytesMessage.getBodyLength(); i++)
                 {
                     builder.append((char) bytesMessage.readByte());
                 }
 
-                msg.acknowledge();
-                this.logger.info("Byte message received, length = " + bytesMessage.getBodyLength() + ", content:\n"
-                        + builder.toString());
+                message.acknowledge();
+                logger.info("Byte message received, length = " + bytesMessage.getBodyLength() + ", content:\n" + builder.toString());
             }
             else
             {
-                this.logger.error("Message of unexpected type received");
-                msg.acknowledge();
+                logger.error("Message of unexpected type received");
+                message.acknowledge();
             }
         }
-        catch (JMSException ex)
+        catch (JMSException e)
         {
-            this.logger.error("Failed to receive a message");
-            throw ex;
+            logger.error("Failed to receive a message");
+            throw e;
         }
     }
 
@@ -225,16 +197,16 @@ public abstract class BrokerConnector implements Closeable
     {
         try
         {
-            if (this.connection != null)
+            if (connection != null)
             {
-                this.connection.close();
-                this.logger.info("Disconnected");
+                connection.close();
+                logger.info("Disconnected");
             }
         }
-        catch (JMSException ex)
+        catch (JMSException e)
         {
-            this.logger.error("Failed to disconnect properly", ex);
-            System.exit(1);
+            logger.error("Failed to disconnect properly", e);
+            throw new RuntimeException("Failed to disconnect properly", e);
         }
     }
 }
