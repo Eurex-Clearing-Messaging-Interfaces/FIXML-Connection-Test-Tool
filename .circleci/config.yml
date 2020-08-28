@@ -1,9 +1,11 @@
-version: 2.1
-
-orbs:
-  maven: circleci/maven@0.0.12
-
-workflows:
-  maven_test:
-    jobs:
-      - maven/test # checkout, build, test, and upload test results
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/openjdk:8-jdk
+    steps:
+      - checkout
+      - run: mvn clean package
+      - store_artifacts: 
+          path: /home/circleci/project/target/fixml-connection-test-tool.zip
+          destination: fixml-connection-test-tool.zip
