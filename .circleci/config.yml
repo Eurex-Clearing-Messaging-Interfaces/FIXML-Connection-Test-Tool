@@ -5,4 +5,9 @@ jobs:
       - image: circleci/openjdk:8-jdk
     steps:
       - checkout
-      - run: mvn install
+      - run: mvn clean package
+	  - store_test_results:
+			  path: test-results
+	  - store_artifacts:
+			  path: /home/circleci/project/target/fixml-connection-test-tool.zip
+			  destination: zip
