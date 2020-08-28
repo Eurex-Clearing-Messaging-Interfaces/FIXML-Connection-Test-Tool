@@ -6,6 +6,6 @@ jobs:
     steps:
       - checkout
       - run: mvn clean package
-      - run: ls -la /home/circleci/project/target/
       - store_artifacts: 
           path: /home/circleci/project/target/fixml-connection-test-tool.zip
+          destination: fixml-connection-test-tool.zip
