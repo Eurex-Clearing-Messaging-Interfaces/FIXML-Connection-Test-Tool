@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 jobs:
   build:
     docker:
@@ -6,8 +6,4 @@ jobs:
     steps:
       - checkout
       - run: mvn clean package
-	  - store_test_results:
-			  path: test-results
-	  - store_artifacts:
-			  path: /home/circleci/project/target/fixml-connection-test-tool.zip
-			  destination: zip
+	  
