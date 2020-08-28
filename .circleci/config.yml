@@ -5,5 +5,4 @@ jobs:
       - image: circleci/openjdk:8-jdk
     steps:
       - checkout
-      - run: pwd
-      - run: ls -la
+      - run: mvn clean package
