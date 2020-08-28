@@ -3,6 +3,5 @@ jobs:
   build:
     docker:
       - image: circleci/openjdk:8-jdk
-    working_directory: ~/circleci/fixml-connection-test-tool
     steps:
       - run: mvn clean package
