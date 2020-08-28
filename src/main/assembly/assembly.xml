@@ -22,25 +22,25 @@
       <directory>${project.basedir}</directory>
       <outputDirectory>doc</outputDirectory>
       <includes>
-	    <include>README.md</include>
+        <include>README.md</include>
       </includes>
     </fileSet>
 
     <fileSet>
       <directory>${project.basedir}/target</directory>
       <outputDirectory>lib</outputDirectory>
-        <includes>
-	      <include>fixml-connection-test-tool.jar</include>
-        </includes>
+      <includes>
+        <include>fixml-connection-test-tool.jar</include>
+      </includes>
     </fileSet>
 
     <fileSet>
       <directory>${project.basedir}</directory>
       <outputDirectory>.</outputDirectory>
-        <includes>
-	      <include>broadcast-receiver.*</include>
-	      <include>request-responder.*</include>
-        </includes>
+      <includes>
+        <include>broadcast-receiver.*</include>
+        <include>request-responder.*</include>
+      </includes>
     </fileSet>
 
   </fileSets>
