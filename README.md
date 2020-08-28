@@ -5,8 +5,7 @@
 ## Download
 Releases can be downloaded from the release section.
 Following links are to the latest snapshot (nightly) builds.
-- Latest completed snapshot build - [ZIP](https://circleci.com/api/v1/project/Eurex-Clearing-Messaging-Interfaces/FIXML-Connection-Test-Tool/latest/artifacts/0/$CIRCLE_ARTIFACTS/build/fixml-connection-test-tool.zip)
-[JAR](https://circleci.com/api/v1/project/Eurex-Clearing-Messaging-Interfaces/FIXML-Connection-Test-Tool/latest/artifacts/0/$CIRCLE_ARTIFACTS/build/fixml-connection-test-tool.jar)
+- Latest completed snapshot build - [ZIP](https://circleci.com/api/v1/project/Eurex-Clearing-Messaging-Interfaces/FIXML-Connection-Test-Tool/latest/artifacts/0/fixml-connection-test-tool.zip)
 
 ## Overview
 
