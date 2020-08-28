@@ -1,9 +1,14 @@
-version: 2.1
+version: 2.0
 
-orbs:
-  maven: circleci/maven@0.0.12
+machine:
+  java:
+    version: oraclejdk8
 
-workflows:
-  maven_test:
-    jobs:
-      - maven/test # checkout, build, test, and upload test results
+test:
+  override:
+    - mvn clean package
+  post:
+    - mkdir $CIRCLE_ARTIFACTS/build
+    - mv ./target/fixml-connection-test-tool.* $CIRCLE_ARTIFACTS/build
+    - mkdir $CIRCLE_ARTIFACTS/findbugs
+    - mv ./target/findbugs/*.html $CIRCLE_ARTIFACTS/findbugs
