@@ -35,6 +35,10 @@ Unzip the archive content into a destination directory. Under Linux, it is neces
 
 From the unzipped archive execute either `./broadcast-receiver.sh` (Linux) / `broadcast-receiver.bat` (Windows) for testing the broadcast functionality or `./request-responder.sh` (Linux) / `request-responder.bat` (Windows) for testing the request/response functionality. This will print all the available command line parameters. Parameters with an additional value may be written as `--param=value` or `--param value`.
 
+:information_source: _**Note:** If the tool is used under Windows, use normal slashes `/` when referencing the full or relative path to certificates. Do not use backslashes `\`:_
+  - :heavy_check_mark: `C:/<directory>/CBKFR_CBKFRALMMACC1.keystore` - OK
+  - :x: `C:\<directory>\CBKFR_CBKFRALMMACC1.keystore` - Not OK
+
 ### Mandatory parameters
 - **--account <account name>** Member account ID
 - **--host <host name/IP addr>** AMQP broker host name or IP address
