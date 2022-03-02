@@ -22,7 +22,7 @@ The FIXML Connection Test Tool is developed using Java 1.8. Functionality under 
 
 ## Used API
 
-The FIXML Connection Test Tool is based on Java API from the Apache Qpid project ( http://qpid.apache.org ), version 0.52.0. All necessary components are distributed as part of the ZIP file in the "lib" sub-directory. 
+The FIXML Connection Test Tool is based on Java API from the Apache Qpid project ( http://qpid.apache.org ), version 0.52.0. All necessary components are distributed as part of the ZIP file in the "lib" subdirectory. 
 The code used in the FIXML Connection Test Tool is described in the Eurex Clearing FIXML Interface specification, Volume 2-B: AMQP Programming Guide, which is available in the document section of the Eurex website ( https://www.eurexclearing.com/clearing-en/technology/c7/system-documentation-c7/System-documentation-31378?frag=246932 ).
 
 ## Installation
@@ -69,7 +69,7 @@ From the unzipped archive execute either `./broadcast-receiver.sh` (Linux) / `br
 
 ### Output
 
-Depending on the chosen logging level, the output will contain more or less informational messages.
+Depending on the chosen log level, the output will contain more or less informational messages.
 
 #### Message received
 For the default log level, the following kind of output is expected in case of a successfully received message:
@@ -492,7 +492,7 @@ following error message is expected ("Signature does not match" exception):
 
 ### Output
 
-Depending on the chosen logging level, the output will contain more or less informational messages.
+Depending on the chosen log level, the output will contain more or less informational messages.
 
 #### Message sent and received
 
