@@ -32,7 +32,7 @@ public class RequestResponder extends BrokerConnector
     private MessageConsumer responseConsumer;
     private MessageProducer requestProducer;
     private Destination replyDestination;
-    private String msgContent;
+    private final String msgContent;
 
     public RequestResponder(final RequestResponderOptions options) throws FileNotFoundException
     {
@@ -119,6 +119,7 @@ public class RequestResponder extends BrokerConnector
             options.printReceivedOptions();
             try (final RequestResponder requestResponder = new RequestResponder(options))
             {
+                requestResponder.checkConnection();
                 requestResponder.checkCertificateStores();
                 requestResponder.connect();
                 requestResponder.produceMessage();

@@ -24,6 +24,8 @@ import java.io.Closeable;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -57,6 +59,20 @@ public abstract class BrokerConnector implements Closeable
                 System.getProperty("javax.net.ssl.trustStorePassword"), options.privateKeyAlias,
                 options.verifyHostname);
         properties.setProperty("connectionfactory.connection", brokerConnectionString);
+    }
+
+    protected void checkConnection() throws HandledException
+    {
+        logger.info("Checking connection " + options.hostname + ":" + options.port + " (timeout limit = " + options.connectionCheckTimeout + " ms).");
+        try (Socket socket = new Socket())
+        {
+            socket.connect(new InetSocketAddress(options.hostname, options.port), options.connectionCheckTimeout);
+        }
+        catch (IOException e)
+        {
+            throw new HandledException("Connection check failed: " + e);
+        }
+        logger.info("Connection OK.");
     }
 
     protected void checkCertificateStores() throws HandledException
@@ -178,7 +194,7 @@ public abstract class BrokerConnector implements Closeable
                 }
 
                 message.acknowledge();
-                logger.info("Byte message received, length = " + bytesMessage.getBodyLength() + ", content:\n" + builder.toString());
+                logger.info("Byte message received, length = " + bytesMessage.getBodyLength() + ", content:\n" + builder);
             }
             else
             {

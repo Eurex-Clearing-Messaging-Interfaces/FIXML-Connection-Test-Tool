@@ -64,6 +64,7 @@ public class BroadcastReceiver extends BrokerConnector
             options.printReceivedOptions();
             try (final BroadcastReceiver broadcastReceiver = new BroadcastReceiver(options))
             {
+                broadcastReceiver.checkConnection();
                 broadcastReceiver.checkCertificateStores();
                 broadcastReceiver.connect();
                 broadcastReceiver.consumeMessage();

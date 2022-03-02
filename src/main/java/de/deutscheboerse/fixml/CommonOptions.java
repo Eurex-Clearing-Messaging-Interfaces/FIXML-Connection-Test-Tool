@@ -33,12 +33,14 @@ public abstract class CommonOptions
     protected static final String SSL_DEBUG = "ssl-debug";
     protected static final String LOG_LEVEL = "log-level";
     protected static final String TIMEOUT = "timeout";
+    protected static final String CONNECTION_CHECK_TIMEOUT = "connection-check-timeout";
 
     protected final Options options = new Options();
     protected final CommandLineParser parser = new DefaultParser();
     protected CommandLine line;
 
     public int timeout = 1000;
+    public int connectionCheckTimeout = 10000;
     public String hostname = "127.0.0.1";
     public int port = 5671;
     public String accountID = "ABCFR_ABCFRALMMACC1";
@@ -60,7 +62,8 @@ public abstract class CommonOptions
         addOption(VERIFY_HOSTNAME, "Verify remote host identity (default: " + (verifyHostname ? "on)" : "off)"));
         addOption(SSL_DEBUG, "Detailed SSL logging (default: off)");
         addOption(LOG_LEVEL, "Logging level (default: INFO; other possibilities: ERROR, WARN, DEBUG, TRACE)", "level");
-        addOption(TIMEOUT, "How long to wait for a message (default: " + timeout + ")", "time-out in ms");
+        addOption(TIMEOUT, "How long to wait for a message (default: " + timeout + " ms)", "time-out in ms");
+        addOption(CONNECTION_CHECK_TIMEOUT, "How long to wait for a connection check (default: " + connectionCheckTimeout + " ms)", "time-out in ms");
     }
 
     public void printReceivedOptions()
@@ -94,6 +97,11 @@ public abstract class CommonOptions
         if (line.hasOption(TIMEOUT))
         {
             timeout = Integer.parseInt(line.getOptionValue(TIMEOUT));
+        }
+
+        if (line.hasOption(CONNECTION_CHECK_TIMEOUT))
+        {
+            connectionCheckTimeout = Integer.parseInt(line.getOptionValue(CONNECTION_CHECK_TIMEOUT));
         }
 
         if (line.hasOption(PORT))
