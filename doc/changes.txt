@@ -1,0 +1,7 @@
+Version: 1.5.1
+==============
+ * created change log: doc/changes.txt
+ * created version file: doc/version.txt
+ * connection check - happens right after certificate check
+ * print out of basic info (version, build timestamp, host/IP, supported TLS versions, list of included libraries)
+ * checking keystore and truststore existence

@@ -119,8 +119,9 @@ public class RequestResponder extends BrokerConnector
             options.printReceivedOptions();
             try (final RequestResponder requestResponder = new RequestResponder(options))
             {
-                requestResponder.checkConnection();
+                requestResponder.printInfo();
                 requestResponder.checkCertificateStores();
+                requestResponder.checkConnection();
                 requestResponder.connect();
                 requestResponder.produceMessage();
                 requestResponder.consumeMessage();

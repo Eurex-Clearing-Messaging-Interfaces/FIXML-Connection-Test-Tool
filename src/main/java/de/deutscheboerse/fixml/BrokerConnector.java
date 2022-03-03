@@ -61,6 +61,17 @@ public abstract class BrokerConnector implements Closeable
         properties.setProperty("connectionfactory.connection", brokerConnectionString);
     }
 
+    protected void printInfo()
+    {
+        logger.info("Printing FIXML Connection Test Tool information:"
+                + "\n\nVersion: " + ApplicationInfo.getVersion()
+                + "\nBuild timestamp: " + ApplicationInfo.getTimestamp()
+                + "\nSupported TLS versions: " + ApplicationInfo.getSupportedTlsVersions()
+                + "\nHost/IP: " + ApplicationInfo.getAddress()
+                + "\nList of dependencies: " + ApplicationInfo.getDependencies()
+                + "\n");
+    }
+
     protected void checkConnection() throws HandledException
     {
         logger.info("Checking connection " + options.hostname + ":" + options.port + " (timeout limit = " + options.connectionCheckTimeout + " ms).");

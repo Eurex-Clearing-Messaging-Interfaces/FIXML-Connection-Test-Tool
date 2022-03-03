@@ -16,6 +16,8 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 public abstract class CommonOptions
@@ -140,7 +142,12 @@ public abstract class CommonOptions
 
         if (line.hasOption(TRUSTSTORE))
         {
-            System.setProperty("javax.net.ssl.trustStore", line.getOptionValue(TRUSTSTORE));
+            final String truststore = line.getOptionValue(TRUSTSTORE);
+            if (!Files.exists(Paths.get(truststore)))
+            {
+                throw new IllegalArgumentException("Truststore path " + truststore + " does not exist.");
+            }
+            System.setProperty("javax.net.ssl.trustStore", truststore);
         }
 
         if (line.hasOption(TRUSTSTORE_PASS))
@@ -150,7 +157,12 @@ public abstract class CommonOptions
 
         if (line.hasOption(KEYSTORE))
         {
-            System.setProperty("javax.net.ssl.keyStore", line.getOptionValue(KEYSTORE));
+            final String keystore = line.getOptionValue(KEYSTORE);
+            if (!Files.exists(Paths.get(keystore)))
+            {
+                throw new IllegalArgumentException("Keystore path " + keystore + " does not exist.");
+            }
+            System.setProperty("javax.net.ssl.keyStore", keystore);
         }
 
         if (line.hasOption(KEYSTORE_PASS))

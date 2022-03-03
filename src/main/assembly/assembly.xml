@@ -43,6 +43,11 @@
       </includes>
     </fileSet>
 
+    <fileSet>
+      <directory>${project.basedir}/doc</directory>
+      <outputDirectory>doc</outputDirectory>
+    </fileSet>
+
   </fileSets>
 
 </assembly>

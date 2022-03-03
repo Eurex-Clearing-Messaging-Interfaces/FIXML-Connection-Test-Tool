@@ -18,11 +18,11 @@ It was designed as a connection tool for members, since the Java SSL debugging c
 
 ## Requirements
 
-The FIXML Connection Test Tool is developed using Java 1.8. Functionality under older or newer versions of Java is not tested. The tool has been tested on both Windows and Linux - it is expected to run without issues on all platforms with official Java support (e.g. Solaris). The tool doesn't have any kind of GUI. That allows its execution on machines without a graphical user interface.
+The FIXML Connection Test Tool is developed using Java 11. Functionality under older or newer versions of Java is not tested. The tool has been tested on both Windows and Linux - it is expected to run without issues on all platforms with official Java support (e.g. Solaris). The tool doesn't have any kind of GUI. That allows its execution on machines without a graphical user interface.
 
 ## Used API
 
-The FIXML Connection Test Tool is based on Java API from the Apache Qpid project ( http://qpid.apache.org ), version 0.52.0. All necessary components are distributed as part of the ZIP file in the "lib" subdirectory. 
+The FIXML Connection Test Tool is based on Java API from the Apache Qpid project ( http://qpid.apache.org ), version 1.5.0. All necessary components are distributed as part of the ZIP file in the "lib" subdirectory. 
 The code used in the FIXML Connection Test Tool is described in the Eurex Clearing FIXML Interface specification, Volume 2-B: AMQP Programming Guide, which is available in the document section of the Eurex website ( https://www.eurexclearing.com/clearing-en/technology/c7/system-documentation-c7/System-documentation-31378?frag=246932 ).
 
 ## Installation

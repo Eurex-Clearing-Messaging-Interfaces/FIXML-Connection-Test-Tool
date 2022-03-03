@@ -1,5 +1,0 @@
-Version: 1.5.1
-==============
- * Major changes:
-	* AMQP-1403: Connection check
- * Fixes:
