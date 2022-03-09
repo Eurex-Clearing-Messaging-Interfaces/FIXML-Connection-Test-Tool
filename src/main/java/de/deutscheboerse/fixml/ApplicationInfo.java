@@ -4,13 +4,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
+import java.io.File;
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 
 public final class ApplicationInfo
@@ -97,12 +97,7 @@ public final class ApplicationInfo
 
     private static Path getApplicationRoot() throws URISyntaxException
     {
-        final String jarLocation = ApplicationInfo.class
-                .getProtectionDomain()
-                .getCodeSource()
-                .getLocation()
-                .toURI()
-                .getPath();
-        return Paths.get(jarLocation).getParent().getParent();
+        final File file = new File(ApplicationInfo.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+        return file.toPath().getParent().getParent();
     }
 }
