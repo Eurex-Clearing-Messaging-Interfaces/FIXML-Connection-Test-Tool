@@ -57,6 +57,7 @@ From the unzipped archive execute either `./broadcast-receiver.sh` (Linux) / `br
 - **--verify-hostname** Verify remote host identity (default: off)
 - **--timeout <time-out in ms>** How long to wait for a message (default: 1000 ms)
 - **--connection-check-timeout <time-out in ms>** How long to wait for a connection check (default: 10000 ms)
+- **--message-count <message count>** How many messages will be processed (default: 1)
 
 ### Optional parameters for broadcast-receiver
 - **--stream <stream name>** Broadcast stream to read from (default: TradeConfirmation)
