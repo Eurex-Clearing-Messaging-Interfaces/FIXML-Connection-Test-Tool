@@ -68,7 +68,10 @@ public class BroadcastReceiver extends BrokerConnector
                 broadcastReceiver.checkCertificateStores();
                 broadcastReceiver.checkConnection();
                 broadcastReceiver.connect();
-                broadcastReceiver.consumeMessage();
+                for (int i = 0; i < options.messageCount; i++)
+                {
+                    broadcastReceiver.consumeMessage();
+                }
             }
             catch (HandledException e)
             {

@@ -123,8 +123,11 @@ public class RequestResponder extends BrokerConnector
                 requestResponder.checkCertificateStores();
                 requestResponder.checkConnection();
                 requestResponder.connect();
-                requestResponder.produceMessage();
-                requestResponder.consumeMessage();
+                for (int i = 0; i < options.messageCount; i++)
+                {
+                    requestResponder.produceMessage();
+                    requestResponder.consumeMessage();
+                }
             }
             catch (HandledException e)
             {

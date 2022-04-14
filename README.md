@@ -18,11 +18,13 @@ It was designed as a connection tool for members, since the Java SSL debugging c
 
 ## Requirements
 
-The FIXML Connection Test Tool is developed using Java 11. Functionality under older or newer versions of Java is not tested. The tool has been tested on both Windows and Linux - it is expected to run without issues on all platforms with official Java support (e.g. Solaris). The tool doesn't have any kind of GUI. That allows its execution on machines without a graphical user interface.
+The FIXML Connection Test Tool is developed using Java 11. The tool has been tested on both Windows and Linux - it is expected to run without issues on all platforms with official Java support (e.g. Solaris). The tool doesn't have any kind of GUI. That allows its execution on machines without a graphical user interface.
+
+:information_source: _**Note:** If the tool needs to be run on a machine with Java 8 use `-P java-8` parameter during the build: e.g. `mvn clean package -P java-8`
 
 ## Used API
 
-The FIXML Connection Test Tool is based on Java API from the Apache Qpid project ( http://qpid.apache.org ), version 1.5.0. All necessary components are distributed as part of the ZIP file in the "lib" subdirectory. 
+The FIXML Connection Test Tool is based on Java API from the Apache Qpid project ( http://qpid.apache.org ), version 1.6.0 (0.61.0 in case of Java 8). All necessary components are distributed as part of the ZIP file in the "lib" subdirectory. 
 The code used in the FIXML Connection Test Tool is described in the Eurex Clearing FIXML Interface specification, Volume 2-B: AMQP Programming Guide, which is available in the document section of the Eurex website ( https://www.eurexclearing.com/clearing-en/technology/c7/system-documentation-c7/System-documentation-31378?frag=246932 ).
 
 ## Installation
@@ -64,6 +66,7 @@ From the unzipped archive execute either `./broadcast-receiver.sh` (Linux) / `br
 - **--msg-content-file <message content file>** File name the content of the message should be read from. To read
                                               from standard input use 'STDIN' name.
 
+:information_source: _**Note:** On some systems the timeouts might be lowered. 
 
 ## Example
     ./broadcast-receiver.sh --account=CBKFR_CBKFRALMMACC1 --host=ecag-fixml-simu1.deutsche-boerse.com --port=10170 --keystore=CBKFR_CBKFRALMMACC1.keystore --keystore-password=123456 --truststore=truststore --truststore-password=123456 --verify-hostname

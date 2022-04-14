@@ -36,6 +36,7 @@ public abstract class CommonOptions
     protected static final String LOG_LEVEL = "log-level";
     protected static final String TIMEOUT = "timeout";
     protected static final String CONNECTION_CHECK_TIMEOUT = "connection-check-timeout";
+    protected static final String MESSAGE_COUNT = "message-count";
 
     protected final Options options = new Options();
     protected final CommandLineParser parser = new DefaultParser();
@@ -43,6 +44,7 @@ public abstract class CommonOptions
 
     public int timeout = 1000;
     public int connectionCheckTimeout = 10000;
+    public int messageCount = 1;
     public String hostname = "127.0.0.1";
     public int port = 5671;
     public String accountID = "ABCFR_ABCFRALMMACC1";
@@ -66,6 +68,7 @@ public abstract class CommonOptions
         addOption(LOG_LEVEL, "Logging level (default: INFO; other possibilities: ERROR, WARN, DEBUG, TRACE)", "level");
         addOption(TIMEOUT, "How long to wait for a message (default: " + timeout + " ms)", "time-out in ms");
         addOption(CONNECTION_CHECK_TIMEOUT, "How long to wait for a connection check (default: " + connectionCheckTimeout + " ms)", "time-out in ms");
+        addOption(MESSAGE_COUNT, "How many messages will be processed (default: " + messageCount + ")", "message count");
     }
 
     public void printReceivedOptions()
@@ -168,6 +171,11 @@ public abstract class CommonOptions
         if (line.hasOption(KEYSTORE_PASS))
         {
             System.setProperty("javax.net.ssl.keyStorePassword", line.getOptionValue(KEYSTORE_PASS));
+        }
+
+        if (line.hasOption(MESSAGE_COUNT))
+        {
+            messageCount = Integer.parseInt(line.getOptionValue(MESSAGE_COUNT));
         }
     }
 
