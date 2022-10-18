@@ -140,7 +140,7 @@ public abstract class CommonOptions
 
         if (line.hasOption(SSL_DEBUG))
         {
-            System.setProperty("javax.net.debug", "ssl");
+            System.setProperty("javax.net.debug", "ssl:handshake:verbose");
         }
 
         if (line.hasOption(TRUSTSTORE))
