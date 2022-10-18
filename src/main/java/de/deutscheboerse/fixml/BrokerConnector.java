@@ -112,24 +112,14 @@ public abstract class BrokerConnector implements Closeable
                 }
             }
             logger.info("Printing out " + storeType + " file '" + storePath + "':");
-            final boolean checkHostnames = (storeType == StoreType.truststore) && options.verifyHostname;
-            boolean hostnameFoundInCertificate = false;
             // print out store certificates
             final Enumeration<String> enumeration = keyStore.aliases();
             while (enumeration.hasMoreElements())
             {
                 String alias = enumeration.nextElement();
-                if (checkHostnames && alias.equals(options.hostname))
-                {
-                    hostnameFoundInCertificate = true;
-                }
                 System.out.println("Alias name: " + alias);
                 Certificate certificate = keyStore.getCertificate(alias);
                 System.out.println(certificate.toString());
-            }
-            if (checkHostnames && !hostnameFoundInCertificate)
-            {
-                throw new HandledException("Hostname '" + options.hostname + "' missing in store '" + storePath + "'");
             }
         }
         catch (IOException | KeyStoreException | CertificateException | NoSuchAlgorithmException e)
