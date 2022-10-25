@@ -3,8 +3,8 @@
 # FIXML Connection Test Tool
 
 ## Download
-Releases can be downloaded from the [release section](https://github.com/Eurex-Clearing-Messaging-Interfaces/FIXML-Connection-Test-Tool/releases/tag/v1.5.1)
-- Latest release v1.5.1: [ZIP](https://github.com/Eurex-Clearing-Messaging-Interfaces/FIXML-Connection-Test-Tool/releases/download/v1.5.1/fixml-connection-test-tool.zip)
+Releases can be downloaded from the [release section](https://github.com/Eurex-Clearing-Messaging-Interfaces/FIXML-Connection-Test-Tool/releases/tag/v1.5.2)
+- Latest release v1.5.2: [ZIP](https://github.com/Eurex-Clearing-Messaging-Interfaces/FIXML-Connection-Test-Tool/releases/download/v1.5.2/fixml-connection-test-tool.zip)
 
 ## Overview
 
