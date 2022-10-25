@@ -19,7 +19,7 @@ It was designed as a connection tool for members, since the Java SSL debugging c
 
 The FIXML Connection Test Tool is developed using Java 11. The tool has been tested on both Windows and Linux - it is expected to run without issues on all platforms with official Java support (e.g. Solaris). The tool doesn't have any kind of GUI. That allows its execution on machines without a graphical user interface.
 
-:information_source: **Note:** If the tool needs to be run on a machine with Java 8 use `-P java-8` parameter during the build: e.g. `mvn clean package -P java-8`
+:information_source: _**Note:** If the tool needs to be run on a machine with Java 8 use `-P java-8` parameter during the build: e.g. `mvn clean package -P java-8`_
 
 ## Used API
 
