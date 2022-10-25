@@ -66,7 +66,7 @@ From the unzipped archive execute either `./broadcast-receiver.sh` (Linux) / `br
 - **--msg-content-file <message content file>** File name the content of the message should be read from. To read
                                               from standard input use 'STDIN' name.
 
-:information_source: _**Note:** On some systems the timeouts might be lowered. 
+:information_source: _**Note:** On some systems the timeouts might be lowered._
 
 ## Example
     ./broadcast-receiver.sh --account=CBKFR_CBKFRALMMACC1 --host=ecag-fixml-simu1.deutsche-boerse.com --port=10170 --keystore=CBKFR_CBKFRALMMACC1.keystore --keystore-password=123456 --truststore=truststore --truststore-password=123456 --verify-hostname
