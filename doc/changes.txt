@@ -1,3 +1,7 @@
+Version: 1.5.2
+==============
+ * removed alias check when --verify-hostname option used
+
 Version: 1.5.1
 ==============
  * created change log: doc/changes.txt
