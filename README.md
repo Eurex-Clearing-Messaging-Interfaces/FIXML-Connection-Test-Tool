@@ -1,5 +1,3 @@
-[![CircleCI](https://circleci.com/gh/Eurex-Clearing-Messaging-Interfaces/FIXML-Connection-Test-Tool.svg?style=shield)](https://circleci.com/gh/Eurex-Clearing-Messaging-Interfaces/FIXML-Connection-Test-Tool)
-
 # FIXML Connection Test Tool
 
 ## Download
