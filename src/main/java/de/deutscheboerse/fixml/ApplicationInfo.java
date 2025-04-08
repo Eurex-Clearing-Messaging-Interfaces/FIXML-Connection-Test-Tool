@@ -97,7 +97,12 @@ public final class ApplicationInfo
 
     private static Path getApplicationRoot() throws URISyntaxException
     {
-        final File file = new File(ApplicationInfo.class.getProtectionDomain().getCodeSource().getLocation().getPath());
-        return file.toPath().getParent().getParent();
+        final Path path = new File(ApplicationInfo.class.getProtectionDomain().getCodeSource().getLocation().getPath()).toPath();
+        final Path parent = path.getParent();
+        if (parent != null)
+        {
+            return parent;
+        }
+        throw new URISyntaxException("Source location is invalid", "Unable to determine application root");
     }
 }

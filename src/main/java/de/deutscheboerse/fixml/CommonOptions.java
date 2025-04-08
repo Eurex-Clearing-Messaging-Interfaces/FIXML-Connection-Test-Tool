@@ -42,14 +42,14 @@ public abstract class CommonOptions
     protected final CommandLineParser parser = new DefaultParser();
     protected CommandLine line;
 
-    public int timeout = 1000;
-    public int connectionCheckTimeout = 10000;
-    public int messageCount = 1;
-    public String hostname = "127.0.0.1";
-    public int port = 5671;
-    public String accountID = "ABCFR_ABCFRALMMACC1";
-    public String privateKeyAlias;
-    public boolean verifyHostname = false;
+    private int timeout = 1000;
+    private int connectionCheckTimeout = 10000;
+    private int messageCount = 1;
+    private String hostname = "127.0.0.1";
+    private int port = 5671;
+    private String accountID = "ABCFR_ABCFRALMMACC1";
+    private String privateKeyAlias;
+    private boolean verifyHostname = false;
 
     private String logLevel = DEFAULT_LOG_LEVEL;
 
@@ -63,12 +63,12 @@ public abstract class CommonOptions
         addMandatoryOption(KEYSTORE, "JKS store file with member account private key(s)", "store file");
         addMandatoryOption(KEYSTORE_PASS, "Password protecting the keystore", "password");
         addOption(KEY_ALIAS, "Alias of the private key to be used (default: same as account name in lower-case)", "alias");
-        addOption(VERIFY_HOSTNAME, "Verify remote host identity (default: " + (verifyHostname ? "on)" : "off)"));
+        addOption(VERIFY_HOSTNAME, "Verify remote host identity (default: " + (isVerifyHostname() ? "on)" : "off)"));
         addOption(SSL_DEBUG, "Detailed SSL logging (default: off)");
         addOption(LOG_LEVEL, "Logging level (default: INFO; other possibilities: ERROR, WARN, DEBUG, TRACE)", "level");
-        addOption(TIMEOUT, "How long to wait for a message (default: " + timeout + " ms)", "time-out in ms");
-        addOption(CONNECTION_CHECK_TIMEOUT, "How long to wait for a connection check (default: " + connectionCheckTimeout + " ms)", "time-out in ms");
-        addOption(MESSAGE_COUNT, "How many messages will be processed (default: " + messageCount + ")", "message count");
+        addOption(TIMEOUT, "How long to wait for a message (default: " + getTimeout() + " ms)", "time-out in ms");
+        addOption(CONNECTION_CHECK_TIMEOUT, "How long to wait for a connection check (default: " + getConnectionCheckTimeout() + " ms)", "time-out in ms");
+        addOption(MESSAGE_COUNT, "How many messages will be processed (default: " + getMessageCount() + ")", "message count");
     }
 
     public void printReceivedOptions()
@@ -101,41 +101,41 @@ public abstract class CommonOptions
 
         if (line.hasOption(TIMEOUT))
         {
-            timeout = Integer.parseInt(line.getOptionValue(TIMEOUT));
+            setTimeout(Integer.parseInt(line.getOptionValue(TIMEOUT)));
         }
 
         if (line.hasOption(CONNECTION_CHECK_TIMEOUT))
         {
-            connectionCheckTimeout = Integer.parseInt(line.getOptionValue(CONNECTION_CHECK_TIMEOUT));
+            setConnectionCheckTimeout(Integer.parseInt(line.getOptionValue(CONNECTION_CHECK_TIMEOUT)));
         }
 
         if (line.hasOption(PORT))
         {
-            port = Integer.parseInt(line.getOptionValue(PORT));
+            setPort(Integer.parseInt(line.getOptionValue(PORT)));
         }
 
         if (line.hasOption(HOST))
         {
-            hostname = line.getOptionValue(HOST);
+            setHostname(line.getOptionValue(HOST));
         }
 
         if (line.hasOption(ACCOUNT))
         {
-            accountID = line.getOptionValue(ACCOUNT);
+            setAccountID(line.getOptionValue(ACCOUNT));
         }
 
         if (line.hasOption(KEY_ALIAS))
         {
-            privateKeyAlias = line.getOptionValue(KEY_ALIAS);
+            setPrivateKeyAlias(line.getOptionValue(KEY_ALIAS));
         }
         else
         {
-            privateKeyAlias = accountID.toLowerCase();
+            setPrivateKeyAlias(getAccountID().toLowerCase());
         }
 
         if (line.hasOption(VERIFY_HOSTNAME))
         {
-            verifyHostname = true;
+            setVerifyHostname(true);
         }
 
         if (line.hasOption(SSL_DEBUG))
@@ -175,7 +175,7 @@ public abstract class CommonOptions
 
         if (line.hasOption(MESSAGE_COUNT))
         {
-            messageCount = Integer.parseInt(line.getOptionValue(MESSAGE_COUNT));
+            setMessageCount(Integer.parseInt(line.getOptionValue(MESSAGE_COUNT)));
         }
     }
 
@@ -213,5 +213,85 @@ public abstract class CommonOptions
                 .argName(argument)
                 .required(true)
                 .build());
+    }
+
+    public int getTimeout()
+    {
+        return timeout;
+    }
+
+    public void setTimeout(int timeout)
+    {
+        this.timeout = timeout;
+    }
+
+    public int getConnectionCheckTimeout()
+    {
+        return connectionCheckTimeout;
+    }
+
+    public void setConnectionCheckTimeout(int connectionCheckTimeout)
+    {
+        this.connectionCheckTimeout = connectionCheckTimeout;
+    }
+
+    public int getMessageCount()
+    {
+        return messageCount;
+    }
+
+    public void setMessageCount(int messageCount)
+    {
+        this.messageCount = messageCount;
+    }
+
+    public String getHostname()
+    {
+        return hostname;
+    }
+
+    public void setHostname(String hostname)
+    {
+        this.hostname = hostname;
+    }
+
+    public int getPort()
+    {
+        return port;
+    }
+
+    public void setPort(int port)
+    {
+        this.port = port;
+    }
+
+    public String getAccountID()
+    {
+        return accountID;
+    }
+
+    public void setAccountID(String accountID)
+    {
+        this.accountID = accountID;
+    }
+
+    public String getPrivateKeyAlias()
+    {
+        return privateKeyAlias;
+    }
+
+    public void setPrivateKeyAlias(String privateKeyAlias)
+    {
+        this.privateKeyAlias = privateKeyAlias;
+    }
+
+    public boolean isVerifyHostname()
+    {
+        return verifyHostname;
+    }
+
+    public void setVerifyHostname(boolean verifyHostname)
+    {
+        this.verifyHostname = verifyHostname;
     }
 }

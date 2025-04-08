@@ -1,3 +1,11 @@
+Version: 1.5.3
+==============
+ * password encoding added to support special characters
+ * removed build profile for Java 8
+ * added build profile for Java 17
+ * dependencies update
+ * removed Circle CI
+
 Version: 1.5.2
 ==============
  * removed alias check when --verify-hostname option used
