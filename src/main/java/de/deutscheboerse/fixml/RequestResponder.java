@@ -7,14 +7,15 @@
  */
 package de.deutscheboerse.fixml;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.LoggerFactory;
 
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
-import javax.jms.TextMessage;
+import jakarta.jms.Destination;
+import jakarta.jms.JMSException;
+import jakarta.jms.MessageConsumer;
+import jakarta.jms.MessageProducer;
+import jakarta.jms.TextMessage;
 import javax.naming.NamingException;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -34,14 +35,15 @@ public class RequestResponder extends BrokerConnector
     private Destination replyDestination;
     private final String msgContent;
 
+    @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
     public RequestResponder(final RequestResponderOptions options) throws FileNotFoundException
     {
         super(options);
         logger = LoggerFactory.getLogger(RequestResponder.class);
-        final String input = options.msgContentFileName;
+        final String input = options.getMsgContentFileName();
         if (input == null)
         {
-            msgContent = options.msgContent;
+            msgContent = options.getMsgContent();
         }
         else
         {
@@ -58,9 +60,9 @@ public class RequestResponder extends BrokerConnector
                 throw e;
             }
         }
-        properties.setProperty("topic.requestAddress", "request." + options.accountID);
-        properties.setProperty("topic.replyAddress", "response/response." + options.accountID);
-        properties.setProperty("queue.responseAddress", "response." + options.accountID);
+        properties.setProperty("topic.requestAddress", "request." + options.getAccountID());
+        properties.setProperty("topic.replyAddress", "response/response." + options.getAccountID());
+        properties.setProperty("queue.responseAddress", "response." + options.getAccountID());
     }
 
     public void connect() throws NamingException, JMSException, HandledException
@@ -123,7 +125,7 @@ public class RequestResponder extends BrokerConnector
                 requestResponder.checkCertificateStores();
                 requestResponder.checkConnection();
                 requestResponder.connect();
-                for (int i = 0; i < options.messageCount; i++)
+                for (int i = 0; i < options.getMessageCount(); i++)
                 {
                     requestResponder.produceMessage();
                     requestResponder.consumeMessage();

@@ -10,14 +10,15 @@ package de.deutscheboerse.fixml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.jms.BytesMessage;
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.Session;
-import javax.jms.TextMessage;
+import jakarta.jms.BytesMessage;
+import jakarta.jms.Connection;
+import jakarta.jms.ConnectionFactory;
+import jakarta.jms.JMSException;
+import jakarta.jms.Message;
+import jakarta.jms.MessageConsumer;
+import jakarta.jms.Session;
+import jakarta.jms.TextMessage;
+
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.io.Closeable;
@@ -26,6 +27,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -36,28 +40,38 @@ import java.util.Properties;
 
 public abstract class BrokerConnector implements Closeable
 {
-    protected enum StoreType
-    {keystore, truststore}
-
+    protected static final Charset ENCODING = StandardCharsets.UTF_8;
     protected final Properties properties = new Properties();
+    private final String hostname;
+    private final int port;
+    private final int connectionCheckTimeout;
+    private final String privateKeyAlias;
+    private final int timeout;
     protected InitialContext context;
     protected Logger logger;
-    protected final CommonOptions options;
     protected Connection connection;
     protected Session session;
-
     public BrokerConnector(final CommonOptions options)
     {
         // create logger
         logger = LoggerFactory.getLogger(BrokerConnector.class);
-        this.options = options;
+        hostname = options.getHostname();
+        port = options.getPort();
+        connectionCheckTimeout = options.getConnectionCheckTimeout();
+        privateKeyAlias = options.getPrivateKeyAlias();
+        timeout = options.getTimeout();
+
         properties.setProperty("java.naming.factory.initial", "org.apache.qpid.jms.jndi.JmsInitialContextFactory");
         final String brokerConnectionString = String.format("amqps://%s:%d?transport.keyStoreLocation=%s&transport.keyStorePassword=%s&" +
                         "transport.trustStoreLocation=%s&transport.trustStorePassword=%s&transport.keyAlias=%s&transport.verifyHost=%s",
-                options.hostname, options.port, System.getProperty("javax.net.ssl.keyStore"),
-                System.getProperty("javax.net.ssl.keyStorePassword"), System.getProperty("javax.net.ssl.trustStore"),
-                System.getProperty("javax.net.ssl.trustStorePassword"), options.privateKeyAlias,
-                options.verifyHostname);
+                hostname,
+                port,
+                System.getProperty("javax.net.ssl.keyStore"),
+                URLEncoder.encode(System.getProperty("javax.net.ssl.keyStorePassword"), ENCODING),
+                System.getProperty("javax.net.ssl.trustStore"),
+                URLEncoder.encode(System.getProperty("javax.net.ssl.trustStorePassword"), ENCODING),
+                privateKeyAlias,
+                options.isVerifyHostname());
         properties.setProperty("connectionfactory.connection", brokerConnectionString);
     }
 
@@ -74,10 +88,10 @@ public abstract class BrokerConnector implements Closeable
 
     protected void checkConnection() throws HandledException
     {
-        logger.info("Checking connection " + options.hostname + ":" + options.port + " (timeout limit = " + options.connectionCheckTimeout + " ms).");
+        logger.info("Checking connection " + hostname + ":" + port + " (timeout limit = " + connectionCheckTimeout + " ms).");
         try (Socket socket = new Socket())
         {
-            socket.connect(new InetSocketAddress(options.hostname, options.port), options.connectionCheckTimeout);
+            socket.connect(new InetSocketAddress(hostname, port), connectionCheckTimeout);
         }
         catch (IOException e)
         {
@@ -106,9 +120,9 @@ public abstract class BrokerConnector implements Closeable
             keyStore.load(inputStream, storePassword.toCharArray());
             if (storeType == StoreType.keystore)
             {
-                if (!keyStore.isKeyEntry(options.privateKeyAlias))
+                if (!keyStore.isKeyEntry(privateKeyAlias))
                 {
-                    throw new HandledException("Alias '" + options.privateKeyAlias + "' missing in store '" + storePath + "'");
+                    throw new HandledException("Alias '" + privateKeyAlias + "' missing in store '" + storePath + "'");
                 }
             }
             logger.info("Printing out " + storeType + " file '" + storePath + "':");
@@ -145,7 +159,7 @@ public abstract class BrokerConnector implements Closeable
             {
                 if ("Error creating connection: Connection refused".equals(e.getMessage()))
                 {
-                    throw new HandledException("Broker is not running on '" + options.hostname + "' port '" + options.port + "'");
+                    throw new HandledException("Broker is not running on '" + hostname + "' port '" + port + "'");
                 }
                 logger.error("Failed to connect or create a session");
                 throw e;
@@ -162,7 +176,7 @@ public abstract class BrokerConnector implements Closeable
     {
         try
         {
-            final Message message = messageConsumer.receive(options.timeout);
+            final Message message = messageConsumer.receive(timeout);
 
             if (message == null)
             {
@@ -226,4 +240,7 @@ public abstract class BrokerConnector implements Closeable
             throw new RuntimeException("Failed to disconnect properly", e);
         }
     }
+
+    protected enum StoreType
+    {keystore, truststore}
 }

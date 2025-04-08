@@ -7,7 +7,7 @@
   <groupId>de.deutscheboerse.fixml</groupId>
   <artifactId>connection-test-tool</artifactId>
   <packaging>jar</packaging>
-  <version>1.5.2</version>
+  <version>1.5.3</version>
   <name>connection-test-tool</name>
   <url>http://maven.apache.org</url>
   <properties>
@@ -29,23 +29,22 @@
         </property>
       </activation>
       <properties>
-        <qpid-jms-client-version>1.6.0</qpid-jms-client-version>
+        <qpid-jms-client-version>2.7.0</qpid-jms-client-version>
       </properties>
     </profile>
     <profile>
-      <id>java-8</id>
+      <id>java-17</id>
       <activation>
         <property>
           <name>profile</name>
-          <value>java-8</value>
+          <value>java-17</value>
         </property>
       </activation>
       <properties>
-        <qpid-jms-client-version>0.61.0</qpid-jms-client-version>
+        <qpid-jms-client-version>2.7.0</qpid-jms-client-version>
       </properties>
     </profile>
   </profiles>
-
 
   <dependencies>
     <dependency>
@@ -55,14 +54,33 @@
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-      <version>1.7.36</version>
+      <artifactId>slf4j-api</artifactId>
+      <version>2.0.17</version>
     </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>2.0.17</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.5.18</version>
+    </dependency>
+
     <dependency>
       <groupId>commons-cli</groupId>
       <artifactId>commons-cli</artifactId>
       <version>1.5.0</version>
     </dependency>
+
+    <dependency>
+      <groupId>com.github.spotbugs</groupId>
+      <artifactId>spotbugs-annotations</artifactId>
+      <version>4.9.3</version>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -70,10 +88,9 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
+        <version>3.14.0</version>
         <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
+          <release>10</release>
         </configuration>
       </plugin>
       <plugin>
@@ -112,11 +129,11 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>findbugs-maven-plugin</artifactId>
-        <version>3.0.5</version>
+        <groupId>com.github.spotbugs</groupId>
+        <artifactId>spotbugs-maven-plugin</artifactId>
+        <version>4.9.3.0</version>
         <configuration>
-          <findbugsXmlOutputDirectory>${project.build.directory}/findbugs</findbugsXmlOutputDirectory>
+          <spotbugsXmlOutputDirectory>${project.build.directory}/spotbugs</spotbugsXmlOutputDirectory>
           <failOnError>false</failOnError>
         </configuration>
         <executions>
@@ -144,16 +161,11 @@
         <configuration>
           <transformationSets>
             <transformationSet>
-              <dir>${project.build.directory}/findbugs</dir>
-              <outputDir>${project.build.directory}/findbugs</outputDir>
+              <dir>${project.build.directory}/spotbugs</dir>
+              <outputDir>${project.build.directory}/spotbugs</outputDir>
               <stylesheet>fancy-hist.xsl</stylesheet>
-              <!--<stylesheet>default.xsl</stylesheet>-->
-              <!--<stylesheet>plain.xsl</stylesheet>-->
-              <!--<stylesheet>fancy.xsl</stylesheet>-->
-              <!--<stylesheet>summary.xsl</stylesheet>-->
               <fileMappers>
-                <fileMapper
-                    implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
+                <fileMapper implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
                   <targetExtension>.html</targetExtension>
                 </fileMapper>
               </fileMappers>
@@ -162,9 +174,9 @@
         </configuration>
         <dependencies>
           <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>findbugs</artifactId>
-            <version>3.0.1</version>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs</artifactId>
+            <version>4.9.3</version>
           </dependency>
         </dependencies>
       </plugin>

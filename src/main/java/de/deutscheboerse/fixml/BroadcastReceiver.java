@@ -10,9 +10,9 @@ package de.deutscheboerse.fixml;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.LoggerFactory;
 
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.MessageConsumer;
+import jakarta.jms.Destination;
+import jakarta.jms.JMSException;
+import jakarta.jms.MessageConsumer;
 import javax.naming.NamingException;
 
 /**
@@ -26,7 +26,7 @@ public class BroadcastReceiver extends BrokerConnector
     {
         super(options);
         logger = LoggerFactory.getLogger(BroadcastReceiver.class);
-        properties.setProperty("queue.broadcastAddress", String.format("broadcast.%s.%s", options.accountID, options.streamID));
+        properties.setProperty("queue.broadcastAddress", String.format("broadcast.%s.%s", options.getAccountID(), options.getStreamID()));
     }
 
     public void connect() throws JMSException, HandledException, NamingException
@@ -68,7 +68,7 @@ public class BroadcastReceiver extends BrokerConnector
                 broadcastReceiver.checkCertificateStores();
                 broadcastReceiver.checkConnection();
                 broadcastReceiver.connect();
-                for (int i = 0; i < options.messageCount; i++)
+                for (int i = 0; i < options.getMessageCount(); i++)
                 {
                     broadcastReceiver.consumeMessage();
                 }

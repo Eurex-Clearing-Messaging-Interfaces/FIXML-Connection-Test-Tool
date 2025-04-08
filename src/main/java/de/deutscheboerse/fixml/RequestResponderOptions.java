@@ -14,13 +14,13 @@ public class RequestResponderOptions extends CommonOptions
     protected static final String MSG_CONTENT = "msg-content";
     protected static final String MSG_CONTENT_FILE = "msg-content-file";
 
-    public String msgContent = "FIXML Connection Test Tool testing message.";
-    public String msgContentFileName;
+    private String msgContent = "FIXML Connection Test Tool testing message.";
+    private String msgContentFileName;
 
     public RequestResponderOptions()
     {
         super();
-        addOption(MSG_CONTENT, "Content of the message to be sent. Default: '" + msgContent + "'", "message content");
+        addOption(MSG_CONTENT, "Content of the message to be sent. Default: '" + getMsgContent() + "'", "message content");
         addOption(MSG_CONTENT_FILE, "File name the content of the message should be read from. To read from standard input use STDIN name.", "message content file");
     }
 
@@ -29,11 +29,31 @@ public class RequestResponderOptions extends CommonOptions
         super.parse(args);
         if (line.hasOption(MSG_CONTENT))
         {
-            msgContent = line.getOptionValue(MSG_CONTENT);
+            setMsgContent(line.getOptionValue(MSG_CONTENT));
         }
         if (line.hasOption(MSG_CONTENT_FILE))
         {
-            msgContentFileName = line.getOptionValue(MSG_CONTENT_FILE);
+            setMsgContentFileName(line.getOptionValue(MSG_CONTENT_FILE));
         }
+    }
+
+    public String getMsgContent()
+    {
+        return msgContent;
+    }
+
+    public void setMsgContent(String msgContent)
+    {
+        this.msgContent = msgContent;
+    }
+
+    public String getMsgContentFileName()
+    {
+        return msgContentFileName;
+    }
+
+    public void setMsgContentFileName(String msgContentFileName)
+    {
+        this.msgContentFileName = msgContentFileName;
     }
 }

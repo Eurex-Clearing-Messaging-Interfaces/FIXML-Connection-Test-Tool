@@ -13,12 +13,12 @@ public class BroadcastReceiverOptions extends CommonOptions
 {
     protected static final String STREAM = "stream";
 
-    public String streamID = "TradeConfirmation";
+    private String streamID = "TradeConfirmation";
 
     BroadcastReceiverOptions()
     {
         super();
-        addOption(STREAM, "Broadcast stream to read from (default: " + streamID + ")", "stream name");
+        addOption(STREAM, "Broadcast stream to read from (default: " + getStreamID() + ")", "stream name");
     }
 
     public void parse(String[] args) throws ParseException
@@ -26,7 +26,17 @@ public class BroadcastReceiverOptions extends CommonOptions
         super.parse(args);
         if (line.hasOption(STREAM))
         {
-            streamID = line.getOptionValue(STREAM);
+            setStreamID(line.getOptionValue(STREAM));
         }
+    }
+
+    public String getStreamID()
+    {
+        return streamID;
+    }
+
+    public void setStreamID(String streamID)
+    {
+        this.streamID = streamID;
     }
 }
