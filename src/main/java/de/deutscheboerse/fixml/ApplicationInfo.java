@@ -101,7 +101,7 @@ public final class ApplicationInfo
         final Path parent = path.getParent();
         if (parent != null)
         {
-            return parent;
+            return parent.getParent();
         }
         throw new URISyntaxException("Source location is invalid", "Unable to determine application root");
     }
